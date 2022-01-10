@@ -401,8 +401,15 @@ end --}}}
 ---Two phase search in git commits. The initial search is with git and the
 -- secondary is with fzf.
 function M.git_grep(term) --{{{
-  local format = "format:%H\t* %h\t%ar\t%an\t%s\t%d"
-  local query = [[git  --no-pager  log  -G '%s' --format='%s']]
+  local format = table.concat({
+    "format:",
+    "%H\t%C(yellow)%h%C(red)%C(reset)\t",
+    "%C(bold green)(%ar)%C(reset)\t",
+    "%s\t",
+    "%C(green)<%an>%C(reset)\t",
+    "%C(blue)%d%C(reset)",
+  })
+  local query = [[git  --no-pager  log  -G '%s' --color=always --format='%s']]
   local source = vim.fn.systemlist(string.format(query, term.args, format))
   local reload_cmd = string.format(query, "{q}", format)
   local wrapped = vim.fn["fzf#wrap"]({ --{{{
@@ -419,6 +426,7 @@ function M.git_grep(term) --{{{
       "--exit-0",
       "--bind",
       string.format('"change:reload:%s"', reload_cmd),
+      "--ansi",
       "--bind",
       '"alt-enter:unbind(change,alt-enter)+change-prompt(2. FZF> )+enable-search+clear-query"',
       "--preview",

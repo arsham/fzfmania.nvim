@@ -81,7 +81,7 @@ local defaults = {
     files    = "<C-p>",                -- show files in cwd
     files_location = {                 -- show files in home or given location
       loc = vim.env.HOME,
-      key = "<M-p",                    -- Alt+p
+      key = "<M-p>",                    -- Alt+p
     },
     buffers            = "<C-b>",      -- show buffers
     delete_buffers     = "<M-b>",      -- delete buffers

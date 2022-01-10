@@ -101,7 +101,7 @@ Here is a list of default configurations:
     files    = "<C-p>",                -- Show files in cwd
     files_location = {                 -- Show files in home or given location
       loc = vim.env.HOME,              -- You can set to any location
-      key = "<M-p",                    -- Alt+p
+      key = "<M-p>",                    -- Alt+p
     },
     buffers            = "<C-b>",      -- Show buffers
     delete_buffers     = "<M-b>",      -- Delete buffers

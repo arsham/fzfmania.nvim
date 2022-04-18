@@ -162,7 +162,7 @@ require("fzf-lua").setup({
       ["alt-/"] = function(lines)
         local file = lines[1]
         vim.api.nvim_command(("e %s"):format(file))
-        fzf.grep_curbuf()
+        fzf.blines()
         actions.ensure_insert_mode()
       end,
     }, --}}}
@@ -402,6 +402,7 @@ require("fzf-lua").setup({
       ["--delimiter"] = "'[\\]:]'",
       ["--with-nth"] = "2..",
       ["--tiebreak"] = "index",
+      ["--no-multi"] = false,
     },
     winopts = {
       preview = {

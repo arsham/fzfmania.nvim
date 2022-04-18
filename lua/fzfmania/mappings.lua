@@ -78,7 +78,7 @@ local function _config(opts)
     local header = "'<CR>:jumps to line, <C-w>:adds to locallist, <C-q>:adds to quickfix list'"
     if opts.frontend then
       vim.keymap.set("n", opts.buffer_lines, function()
-        fzf.grep_curbuf({
+        fzf.blines({
           fzf_opts = { ["--header"] = header },
         })
       end, o)

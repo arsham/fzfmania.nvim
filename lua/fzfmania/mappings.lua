@@ -1,50 +1,101 @@
 local nvim = require("nvim")
 local util = require("fzfmania.util")
+local fzf_cmd = require("fzf-lua.cmd")
+local fzf = require("fzf-lua")
+local fzfgrep = require("fzf-lua.providers.grep")
 
 local function op(desc)
-  return { noremap = true, silent = true, desc = desc }
+  return { silent = true, desc = desc }
 end
 
-local function _config(actions, opts)
+local function _config(opts)
   if opts.commands then --{{{
-    vim.keymap.set("n", opts.commands, ":Commands<CR>", op("show commands"))
+    local o = op("show commands")
+    if opts.frontend then
+      vim.keymap.set("n", opts.commands, function()
+        fzf_cmd.load_command("commands")
+      end, o)
+    else
+      vim.keymap.set("n", opts.commands, ":Commands<CR>", o)
+    end
   end --}}}
 
   if opts.history then --{{{
-    vim.keymap.set("n", opts.history, ":History<CR>", op("show history"))
+    if opts.frontend then
+      vim.keymap.set("n", opts.history, fzf.oldfiles, op("show history"))
+    else
+      vim.keymap.set("n", opts.history, ":History<CR>", op("show history"))
+    end
   end --}}}
 
   if opts.files then --{{{
-    vim.keymap.set("n", opts.files, ":Files<CR>", op("show files"))
+    local o = op("show files")
+    if opts.frontend then
+      vim.keymap.set("n", opts.files, fzf.files, o)
+    else
+      vim.keymap.set("n", opts.files, ":Files<CR>", o)
+    end
   end --}}}
 
   if opts.files_location then --{{{
-    local command = string.format(":Files %s<CR>", opts.files_location.loc)
-    vim.keymap.set("n", opts.files_location.key, command, op("show all files in home directory"))
+    local o = op("show all files in home directory")
+    if opts.frontend then
+      vim.keymap.set("n", opts.files_location.key, function()
+        fzf.files({ cwd = opts.files_location.loc })
+      end, o)
+    else
+      local command = string.format(":Files %s<CR>", opts.files_location.loc)
+      vim.keymap.set("n", opts.files_location.key, command, o)
+    end
   end --}}}
 
   if opts.buffers then --{{{
-    vim.keymap.set("n", opts.buffers, ":Buffers<CR>", op("show buffers"))
+    local o = op("show buffers")
+    if opts.frontend then
+      vim.keymap.set("n", opts.buffers, fzf.buffers, o)
+    else
+      vim.keymap.set("n", opts.buffers, ":Buffers<CR>", o)
+    end
   end --}}}
 
   if opts.delete_buffers then --{{{
-    vim.keymap.set("n", opts.delete_buffers, util.delete_buffer, op("delete buffers"))
+    vim.keymap.set("n", opts.delete_buffers, function()
+      util.delete_buffers(opts.frontend)
+    end, op("delete buffers"))
   end --}}}
 
   if opts.git_files then --{{{
-    vim.keymap.set("n", opts.git_files, ":GitFiles<CR>", op("show files in git (git ls-files)"))
+    local o = op("show files in git (git ls-files)")
+    if opts.frontend then
+      vim.keymap.set("n", opts.git_files, fzf.git_files, o)
+    else
+      vim.keymap.set("n", opts.git_files, ":GitFiles<CR>", o)
+    end
   end --}}}
 
   if opts.buffer_lines then --{{{
-    local header = "<CR>:jumps to line, <C-w>:adds to locallist, <C-q>:adds to quickfix list"
-    vim.keymap.set("n", opts.buffer_lines, function()
-      util.lines_grep(actions, header)
-    end, op("grep lines of current buffer"))
+    local o = op("grep lines of current buffer")
+    local header = "'<CR>:jumps to line, <C-w>:adds to locallist, <C-q>:adds to quickfix list'"
+    if opts.frontend then
+      vim.keymap.set("n", opts.buffer_lines, function()
+        fzf.grep_curbuf({
+          fzf_opts = { ["--header"] = header },
+        })
+      end, o)
+    else
+      vim.keymap.set("n", opts.buffer_lines, function()
+        util.lines_grep(util.fzf_actions, header)
+      end, o)
+    end
   end --}}}
 
   if opts.all_buffer_lines then --{{{
-    local opt = op("search in lines of all open buffers")
-    vim.keymap.set("n", opts.all_buffer_lines, ":Lines<CR>", opt)
+    local o = op("search in lines of all open buffers")
+    if opts.frontend then
+      vim.keymap.set("n", opts.all_buffer_lines, fzf.lines, o)
+    else
+      vim.keymap.set("n", opts.all_buffer_lines, ":Lines<CR>", o)
+    end
   end --}}}
 
   if opts.complete_dict then --{{{
@@ -62,50 +113,100 @@ local function _config(actions, opts)
   end --}}}
 
   if opts.spell_suggestion then --{{{
-    vim.keymap.set("n", opts.spell_suggestion, function()
-      local term = vim.fn.expand("<cword>")
-      vim.fn["fzf#run"]({
-        source = vim.fn.spellsuggest(term),
-        sink = function(new_term)
-          require("arshlib.quick").normal("n", '"_ciw' .. new_term .. "")
-        end,
-        down = 10,
-      })
-    end, { noremap = true, desc = "show spell suggestions" })
+    if opts.frontend then
+      vim.keymap.set(
+        "n",
+        opts.spell_suggestion,
+        fzf.spell_suggest,
+        { desc = "show spell suggestions" }
+      )
+    else
+      vim.keymap.set("n", opts.spell_suggestion, function()
+        local term = vim.fn.expand("<cword>")
+        vim.fn["fzf#run"]({
+          source = vim.fn.spellsuggest(term),
+          sink = function(new_term)
+            require("arshlib.quick").normal("n", '"_ciw' .. new_term .. "")
+          end,
+          down = 10,
+        })
+      end, { desc = "show spell suggestions" })
+    end
   end --}}}
 
   if opts.in_files then --{{{
-    vim.keymap.set("n", opts.in_files, function()
-      util.ripgrep_search("")
-    end, { noremap = true, desc = "find in files" })
+    local o = { desc = "find in files" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.in_files, fzf.grep_project, o)
+    else
+      vim.keymap.set("n", opts.in_files, function()
+        util.ripgrep_search("")
+      end, o)
+    end
   end --}}}
 
   if opts.in_files_force then --{{{
-    vim.keymap.set("n", opts.in_files_force, function()
-      util.ripgrep_search("", true)
-    end, { noremap = true, desc = "find in files (ignore .gitignore)" })
+    local o = { desc = "find in files (ignore .gitignore)" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.in_files_force, function()
+        fzf.grep({
+          search = "",
+          rg_opts = "--no-ignore",
+        })
+      end, o)
+    else
+      vim.keymap.set("n", opts.in_files_force, function()
+        util.ripgrep_search("", true)
+      end, o)
+    end
   end --}}}
 
   if opts.incremental_search then --{{{
-    vim.keymap.set("n", opts.incremental_search, function()
-      util.ripgrep_search_incremental("", true)
-    end, { noremap = true, desc = "incremental search with rg" })
+    local o = { desc = "incremental search with rg" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.incremental_search, function()
+        fzf.live_grep({ exec_empty_query = true })
+      end, o)
+    else
+      vim.keymap.set("n", opts.incremental_search, function()
+        util.ripgrep_search_incremental("", true)
+      end, o)
+    end
   end --}}}
 
   if opts.current_word then --{{{
-    vim.keymap.set("n", opts.current_word, function()
-      util.ripgrep_search(vim.fn.expand("<cword>"))
-    end, { noremap = true, desc = "search over current word" })
+    local o = { desc = "search over current word" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.current_word, fzfgrep.grep_cword, o)
+    else
+      vim.keymap.set("n", opts.current_word, function()
+        util.ripgrep_search(vim.fn.expand("<cword>"))
+      end, o)
+    end
   end --}}}
 
   if opts.current_word_force then --{{{
-    vim.keymap.set("n", opts.current_word_force, function()
-      util.ripgrep_search(vim.fn.expand("<cword>"), true)
-    end, { noremap = true, desc = "search over current word (ignore .gitignore)" })
+    local o = { desc = "search over current word (ignore .gitignore)" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.current_word_force, function()
+        fzfgrep.grep_cword({
+          rg_opts = "--no-ignore",
+        })
+      end, o)
+    else
+      vim.keymap.set("n", opts.current_word_force, function()
+        util.ripgrep_search(vim.fn.expand("<cword>"), true)
+      end, o)
+    end
   end --}}}
 
   if opts.marks then --{{{
-    vim.keymap.set("n", opts.marks, ":Marks<CR>", { noremap = true, desc = "show marks" })
+    local o = { desc = "show marks" }
+    if opts.frontend then
+      vim.keymap.set("n", opts.marks, fzf.marks, o)
+    else
+      vim.keymap.set("n", opts.marks, ":Marks<CR>", o)
+    end
   end --}}}
 
   if opts.tags then --{{{

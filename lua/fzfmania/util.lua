@@ -5,12 +5,16 @@ local quick = require("arshlib.quick")
 local lsp = require("arshlib.lsp")
 local listish = require("listish")
 local reloader = require("plenary.reload")
+local fzf = require("fzf-lua")
+local fzfcore = require("fzf-lua.core")
+local fzfutils = require("fzf-lua.utils")
+local fzfconfig = require("fzf-lua.config")
 
 local M = {}
 
 ---Launches a ripgrep search with a fzf search interface.
 ---@param term? string if empty, the search will only happen on the content.
----@param no_ignore? string disables the ignore rules.
+---@param no_ignore? boolean disables the ignore rules.
 function M.ripgrep_search(term, no_ignore) --{{{
   term = vim.fn.shellescape(term)
   local nth = ""
@@ -105,8 +109,7 @@ function M.ripgrep_search_incremental(term, no_ignore) --{{{
   vim.fn["fzf#vim#grep"](initial, 1, preview)
 end --}}}
 
----Shows all opened buffers and let you search and delete them.
-function M.delete_buffer() --{{{
+local function delete_buffers_native() --{{{
   local list = vim.fn.getbufinfo({ buflisted = 1 })
   local buf_list = {
     table.concat({ "", "", "", "Buffer", "", "Filename", "" }, "\t"),
@@ -167,6 +170,31 @@ function M.delete_buffer() --{{{
     end
   end
   vim.fn["fzf#run"](preview)
+end --}}}
+
+---Shows all opened buffers and let you search and delete them.
+-- @param frontend? boolean if true it uses fzf-lua
+function M.delete_buffers(frontend) --{{{
+  if not frontend then
+    delete_buffers_native()
+    return
+  end
+  fzf.buffers({
+    prompt = "Delete Buffers > ",
+    ignore_current_buffer = false,
+    sort_lastused = false,
+    fzf_opts = {
+      ["--header"] = "'" .. table.concat({ "Buffer", "", "Filename", "" }, "\t") .. "'",
+    },
+    actions = {
+      ["default"] = function(selected)
+        for _, name in pairs(selected) do
+          local num = name:match("^%[([^%]]+)%]")
+          pcall(vim.api.nvim_buf_delete, tonumber(num), {})
+        end
+      end,
+    },
+  })
 end --}}}
 
 ---Searches in the lines of current buffer. It provides an incremental search
@@ -342,8 +370,8 @@ function M.marks() --{{{
   vim.fn["fzf#vim#marks"](preview, 0)
 end --}}}
 
----Show marks for deletion.
-function M.delete_marks() --{{{
+---Show marks for deletion using fzf's native ui.
+function M.delete_marks_native() --{{{
   local mark_list = _t({
     ("666\tmark\t%5s\t%3s\t%s"):format("line", "col", "file/text"),
   })
@@ -398,18 +426,65 @@ function M.delete_marks() --{{{
   vim.fn["fzf#run"](preview)
 end --}}}
 
+---Show marks for deletion.
+function M.delete_marks() --{{{
+  local opts = {
+    fzf_opts = {
+      ["--multi"] = "",
+      ["--exit-0"] = "",
+      ["--bind"] = "ctrl-a:select-all+accept",
+    },
+  }
+  opts = fzfconfig.normalize_opts(opts, fzfconfig.globals.nvim.marks)
+  if not opts then
+    return
+  end
+
+  local marks = vim.fn.execute("marks")
+  marks = vim.split(marks, "\n")
+
+  local entries = {}
+  for i = #marks, 3, -1 do
+    if string.match(string.lower(marks[i]), "^%s+[a-z]") then
+      local mark, line, col, text = marks[i]:match("(.)%s+(%d+)%s+(%d+)%s+(.*)")
+      table.insert(
+        entries,
+        string.format(
+          "%-15s %-15s %-15s %s",
+          fzfutils.ansi_codes.yellow(mark),
+          fzfutils.ansi_codes.blue(line),
+          fzfutils.ansi_codes.green(col),
+          text
+        )
+      )
+    end
+  end
+
+  table.sort(entries, function(a, b)
+    return a < b
+  end)
+
+  fzfcore.fzf_wrap(opts, entries, function(selected)
+    for _, name in ipairs(selected) do
+      local mark = string.match(name, "^(%a)")
+      nvim.ex.delmarks(mark)
+    end
+  end)()
+end -- }}}
+
 ---Two phase search in git commits. The initial search is with git and the
 -- secondary is with fzf.
 function M.git_grep(term) --{{{
-  local format = table.concat({
-    "format:",
-    "%H\t%C(yellow)%h%C(red)%C(reset)\t",
-    "%C(bold green)(%ar)%C(reset)\t",
-    "%s\t",
-    "%C(green)<%an>%C(reset)\t",
-    "%C(blue)%d%C(reset)",
-  })
-  local query = [[git  --no-pager  log  -G '%s' --color=always --format='%s']]
+  local format = "format:"
+    .. table.concat({
+      "%H",
+      "%C(yellow)%h%C(reset)",
+      "%C(bold green)(%ar)%C(reset)",
+      "%s",
+      "%C(green)<%an>%C(reset)",
+      "%C(blue)%d%C(reset)",
+    }, "\t")
+  local query = [[git --no-pager log -G '%s' --color=always --format='%s']]
   local source = vim.fn.systemlist(string.format(query, term.args, format))
   local reload_cmd = string.format(query, "{q}", format)
   local wrapped = vim.fn["fzf#wrap"]({ --{{{
@@ -452,8 +527,55 @@ function M.git_grep(term) --{{{
   vim.fn["fzf#run"](wrapped)
 end --}}}
 
+---Browse the git tree.
+function M.git_tree() --{{{
+  local format = "format:"
+    .. table.concat({
+      "%H",
+      "%C(yellow)%h%C(reset)",
+      "%C(bold green)(%ar)%C(reset)",
+      "%s",
+      "%C(green)<%an>%C(reset)",
+      "%C(blue)%d%C(reset)",
+    }, "\t")
+
+  local query = [[git --no-pager log --all --color=always --format='%s']]
+  local source = vim.fn.systemlist(string.format(query, format))
+  local wrapped = vim.fn["fzf#wrap"]({ --{{{
+    source = source,
+    options = table.concat({
+      '--prompt="Search in tree> "',
+      "+m",
+      '--delimiter="\t"',
+      "--with-nth=2..",
+      "--nth=3..",
+      "--tiebreak=index",
+      "--preview-window +{3}+3/2,~1,nohidden",
+      "--exit-0",
+      "--ansi",
+      "--preview",
+      '"',
+      [[echo {} | grep -o '[a-f0-9]\{7\}' | head -1 |]],
+      "xargs -I % sh -c 'git show --color=always %'",
+      '"',
+    }, " "),
+    placeholder = "{1}",
+  })
+  --}}}
+  wrapped["sink*"] = function(list)
+    local sha = list[2]:match("^[^\t]*")
+    if sha ~= "" then
+      local toplevel = vim.fn.system("git rev-parse --show-toplevel")
+      toplevel = string.gsub(toplevel, "\n", "")
+      local str = string.format([[fugitive://%s/.git//%s]], toplevel, sha)
+      nvim.ex.edit(str)
+    end
+  end
+  vim.fn["fzf#run"](wrapped)
+end --}}}
+
 ---Checkout a branch.
-function M.checkout_branck() --{{{
+function M.checkout_branch() --{{{
   local current = vim.fn.system("git symbolic-ref --short HEAD")
   current = current:gsub("\n", "")
   local current_escaped = current:gsub("/", "\\/")
@@ -504,8 +626,8 @@ function M.open_todo(extra_terms) --{{{
   vim.fn["fzf#vim#grep"](cmd, 1, vim.fn["fzf#vim#with_preview"]())
 end --}}}
 
----Find and add files to the args list.
-function M.add_args() --{{{
+---Find and add files to the args list using fzf.vim native interface.
+local function add_args_native() --{{{
   local seen = _t()
   _t(vim.fn.argv()):map(function(v)
     seen[v] = true
@@ -537,6 +659,23 @@ function M.add_args() --{{{
     nvim.ex.arga(lines)
   end
   vim.fn["fzf#run"](wrapped)
+end --}}}
+
+---Find and add files to the args list.
+-- @param frontend? boolean if true it uses the fzf-lua interface.
+function M.add_args() --{{{
+  fzf.files({
+    prompt = "Choose Files > ",
+    -- fzf_opts = {
+    --   ["--header"] = "'" .. table.concat({ "Buffer", "", "Filename", "" }, "\t") .. "'",
+    -- },
+    fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+    actions = {
+      ["default"] = function(selected)
+        nvim.ex.arga(selected)
+      end,
+    },
+  })
 end --}}}
 
 ---Choose and remove files from the args list.
@@ -590,6 +729,119 @@ function M.goto_def(lines) --{{{
   end
   nvim.ex.BTags()
 end --}}}
+
+function M.autocmds() --{{{
+  local autocmds = vim.api.nvim_get_autocmds({})
+  local source = {}
+  for _, item in pairs(autocmds) do
+    local buf = item.buflocal and colour.ansi_color(colour.colours.red, "BUF") or ""
+    local once = item.once and colour.ansi_color(colour.colours.yellow, "ONCE") or ""
+    local line = table.concat({
+      colour.ansi_color(colour.colours.blue, item.event),
+      buf .. once,
+      colour.ansi_color(colour.colours.green, item.pattern),
+      item.command,
+    }, "\t")
+    table.insert(source, line)
+  end
+
+  local wrapped = vim.fn["fzf#wrap"]({
+    source = source,
+    options = table.concat({
+      '--prompt "Search Term > "',
+      "--header 'Event\tBuffer/Once\tPattern\tCommand'",
+      "+m",
+      "--exit-0",
+      "--ansi",
+      "--delimiter '\t'",
+      "--no-preview",
+      "--tiebreak=index",
+    }, " "),
+    placeholder = "{1}",
+  })
+
+  wrapped["sink*"] = function() end
+  vim.fn["fzf#run"](wrapped)
+end --}}}
+
+function M.jumps(opts) --{{{
+  local config = require("fzf-lua.config")
+  local utils = require("fzf-lua.utils")
+  local core = require("fzf-lua.core")
+  local actions = require("fzf-lua.actions")
+  opts = config.normalize_opts(opts, config.globals.nvim.jumps)
+  if not opts then
+    return
+  end
+
+  local jumps = vim.fn.execute(opts.cmd)
+  jumps = vim.split(jumps, "\n")
+
+  local entries = {}
+  for i = #jumps - 1, 3, -1 do
+    local jump, line, col, text = jumps[i]:match("(%d+)%s+(%d+)%s+(%d+)%s+(.*)")
+    table.insert(
+      entries,
+      string.format(
+        "%-15s %-15s %-15s %s",
+        utils.ansi_codes.yellow(jump),
+        utils.ansi_codes.blue(line),
+        utils.ansi_codes.green(col),
+        text
+      )
+    )
+  end
+
+  opts.fzf_opts["--no-multi"] = ""
+
+  core.fzf_wrap(opts, entries, function(selected)
+    if not selected then
+      return
+    end
+    actions.act(opts.actions, selected, opts)
+  end)()
+end --}}}
+
+---Shows a fzf search for going to a line number.
+---@param lines string[]
+local function goto_line(lines) --{{{
+  local file = lines[1]
+  vim.api.nvim_command(("e %s"):format(file))
+  quick.normal("n", ":")
+end --}}}
+
+---Shows a fzf search for line content.
+---@param lines string[]
+local function search_file(lines) --{{{
+  local file = lines[1]
+  vim.api.nvim_command(("e +BLines %s"):format(file))
+end --}}}
+
+---Set selected lines in the quickfix list with fzf search.
+---@param items string[]|table[]
+local function set_qf_list(items) --{{{
+  M.insert_into_list(items, false)
+  nvim.ex.copen()
+end --}}}
+
+---Set selected lines in the local list with fzf search.
+---@param items string[]|table[]
+local function set_loclist(items) --{{{
+  M.insert_into_list(items, true)
+  nvim.ex.lopen()
+end --}}}
+
+M.fzf_actions = { --{{{
+  ["ctrl-t"] = "tab split",
+  ["ctrl-s"] = "split",
+  ["ctrl-v"] = "vsplit",
+  ["alt-q"] = set_qf_list,
+  ["alt-w"] = set_loclist,
+  ["alt-@"] = M.goto_def,
+  ["alt-:"] = goto_line,
+  ["alt-/"] = search_file,
+} --}}}
+vim.g.fzf_action = M.fzf_actions
 
 return M
 

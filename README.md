@@ -34,6 +34,8 @@ as dependencies in your package manager:
 | [listish.nvim](https://github.com/arsham/listish.nvim)   | for sinking to lists      |
 | [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) |                           |
 | [nvim.lua](https://github.com/norcalli/nvim.lua)         |                           |
+| [fzf.vim](https://github.com/junegunn/fzf.vim)           |                           |
+| [fzf-lua](https://github.com/ibhagwan/fzf-lua)           | (Optional) for better ui  |
 | [fd](https://github.com/sharkdp/fd)                      | fast file find            |
 | [Ripgrep](https://github.com/BurntSushi/ripgrep)         |                           |
 | [bat](https://github.com/sharkdp/bat)                    | colour scheme in previews |
@@ -45,8 +47,22 @@ Use your favourite package manager to install this library. Packer example:
 ```lua
 use({
   "arsham/fzfmania.nvim",
-  requires = { "arshlib.nvim", "listish.nvim", "nvim.lua", "plenary.nvim" },
-  config = function() require("fzfmania").config({})
+  requires = {
+    "arshlib.nvim",
+    "fzf.vim",
+    "nvim.lua",
+    "plenary.nvim",
+    -- uncomment if you want a better ui.
+    -- {
+    --   "ibhagwan/fzf-lua",
+    --   requires = { "kyazdani42/nvim-web-devicons" },
+    -- },
+  },
+  after = { "listish.nvim", "fzf-lua" },
+  config = function() require("fzfmania").config({
+    -- frontend = "fzf-lua", -- uncomment if you want a better ui.
+  }),
+  event = { "UIEnter" }, -- best way to lazy load this plugin
 })
 ```
 
@@ -65,6 +81,7 @@ replacements, or disable them by setting them to `false`.
 
 ```lua
 require("fzfmania").config({
+  frontend = "fzf-lua", -- uses fzf-lua for handling the ui
   mappings = {
     git_files = false,
     in_files = false,
@@ -93,6 +110,7 @@ Here is a list of default configurations:
 ```lua
 {
   fzf_history_dir = vim.env.HOME .. "/.local/share/fzf-history",
+  frontend = "fzf.vim",                -- set to "fzf-lua" for handling the ui
 
   mappings = {
     commands = "<leader>:",            -- Show commands
@@ -115,13 +133,15 @@ Here is a list of default configurations:
     in_files_force     = "<leader>fa", -- Find in files (ignore .gitignore)
     incremental_search = "<leader>fi", -- Incremental search with rg
     current_word       = "<leader>rg", -- Search for current word
-    current_work_force = "<leader>ra", -- Search for current word (ignore .gitignore)
+    current_word_force = "<leader>ra", -- Search for current word (ignore .gitignore)
     marks              = "<leader>mm", -- Show marks
     tags               = "<leader>@",  -- Show tags
+    fzf_builtin        = "<leader>t"   -- Invokes fzf-lua builtin popup
   },
 
   commands = {
     git_grep     = "GGrep",
+    git_tree     = "GTree",
     buffer_lines = "BLines",
     reload       = "Reload",
     config       = "Config",
@@ -133,6 +153,11 @@ Here is a list of default configurations:
     history      = "History",
     checkout     = "Checkout",
     work_tree    = "WorkTree",         -- git work-tree
+    git_status   = "GitStatus",        -- only with fzf-lua frontend
+    jumps        = "Jumps",            -- Choose from the jump list
+    autocmds     = "Autocmds",         -- List autocmds
+    changes      = "Changes",          -- Choose from change list
+    registers    = "Registers",        -- View registers
   },
 }
 ```
@@ -164,6 +189,7 @@ Most actions can apply to multiple selected items if possible.
 | `<Ctrl-x><Ctrl-k>` | Search in **dictionaries** (requires **words-insane**) |
 | `<Ctrl-x><Ctrl-f>` | Search in **f**iles                                    |
 | `<Ctrl-x><Ctrl-l>` | Search in **l**ines                                    |
+| `<leader>t`        | Invoke fzf-lua builtin popup                           |
 
 If you keep hitting `<Ctrl-/>` the preview window will change width. With
 `Shift-/` you can show and hide the preview window.
@@ -192,13 +218,22 @@ cancel, which will land you to the file, and you can invoke `<leader>@` for
 | Command       | Description                                |
 | :------------ | :----------------------------------------- |
 | `GGrep`       | Run **git grep**                           |
-| `Marks`       | Show marks with preview                    |
-| `MarksDelete` | Delete marks                               |
+| `GTree`       | Browse **git** commits                     |
+| `Marks`       | Show **marks** with preview                |
+| `MarksDelete` | Delete **marks**                           |
 | `Todo`        | List **todo**/**fixme** lines              |
-| `ArgAdd`      | Select and add files to the args list      |
-| `ArgDelete`   | Select and delete files from the args list |
+| `ArgsAdd`     | Select and add files to the args list      |
+| `ArgsDelete`  | Select and delete files from the args list |
 | `Worktree`    | Switch between git worktrees               |
 | `Reload`      | Reload one or more lua config files        |
+| `BLines`      | Search in current buffer                   |
+| `History`     | Show open file history                     |
+| `Checkout`    | Checkout a branch                          |
+| `GitStatus`   | Show git status                            |
+| `Jumps`       | Choose from jump list                      |
+| `Autocmds`    | Show autocmds                              |
+| `Changes`     | Show change list                           |
+| `Registers`   | Show register contents                     |
 
 ## Functions
 

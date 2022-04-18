@@ -6,6 +6,7 @@ local libs = {
   listish = "arsham/listish.nvim",
   plenary = "nvim-lua/plenary.nvim",
   nvim = "norcalli/nvim.lua",
+  ["fzf-lua"] = "ibhagwan/fzf-lua",
 }
 
 local executables = {

@@ -1,49 +1,5 @@
-local nvim = require("nvim")
-local quick = require("arshlib.quick")
-local util = require("fzfmania.util")
 table.insert(vim.opt.rtp, vim.env.HOME .. "/.fzf")
 
----Shows a fzf search for going to a line number.
----@param lines string[]
-local function goto_line(lines)
-  local file = lines[1]
-  vim.api.nvim_command(("e %s"):format(file))
-  quick.normal("n", ":")
-end
-
----Shows a fzf search for line content.
----@param lines string[]
-local function search_file(lines)
-  local file = lines[1]
-  vim.api.nvim_command(("e +BLines %s"):format(file))
-end
-
----Set selected lines in the quickfix list with fzf search.
----@param items string[]|table[]
-local function set_qf_list(items)
-  util.insert_into_list(items, false)
-  nvim.ex.copen()
-end
-
----Set selected lines in the local list with fzf search.
----@param items string[]|table[]
-local function set_loclist(items)
-  util.insert_into_list(items, true)
-  nvim.ex.lopen()
-end
-
-local fzf_actions = {
-  ["ctrl-t"] = "tab split",
-  ["ctrl-x"] = "split",
-  ["ctrl-v"] = "vsplit",
-  ["alt-q"] = set_qf_list,
-  ["alt-w"] = set_loclist,
-  ["alt-@"] = util.goto_def,
-  ["alt-:"] = goto_line,
-  ["alt-/"] = search_file,
-}
-vim.g.fzf_action = fzf_actions
---}}}
 vim.g.fzf_commands_expect = "enter"
 vim.g.fzf_layout = {
   window = {
@@ -77,6 +33,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 local defaults = {
   fzf_history_dir = vim.env.HOME .. "/.local/share/fzf-history",
+  frontend = "fzf.vim",                -- default frontend. (fzf-lua|fzf.vim)
 
   mappings = {
     commands = "<leader>:",            -- show commands
@@ -99,13 +56,15 @@ local defaults = {
     in_files_force     = "<leader>fa", -- find in files (ignore .gitignore)
     incremental_search = "<leader>fi", -- incremental search with rg
     current_word       = "<leader>rg", -- search for current word
-    current_work_force = "<leader>ra", -- search for current word (ignore .gitignore)
+    current_word_force = "<leader>ra", -- search for current word (ignore .gitignore)
     marks              = "<leader>mm", -- show marks
     tags               = "<leader>@",  -- show tags
+    fzf_builtin        = "<leader>t"   -- invokes fzf-lua builtin popup
   },
 
   commands = {
     git_grep     = "GGrep",
+    git_tree     = "GTree",
     buffer_lines = "BLines",
     reload       = "Reload",
     config       = "Config",
@@ -117,6 +76,11 @@ local defaults = {
     history      = "History",
     checkout     = "Checkout",
     work_tree    = "WorkTree",         -- git work-tree
+    git_status   = "GitStatus",        -- only with fzf-lua frontend
+    jumps        = "Jumps",
+    autocmds     = "Autocmds",
+    changes      = "Changes",
+    registers    = "Registers",
   },
 }
 -- stylua: ignore end
@@ -126,13 +90,23 @@ local function config(opts)
     mappings = { opts.mappings, { "table", "boolean", "nil" }, false },
     commands = { opts.commands, { "table", "boolean", "nil" }, false },
     fzf_history_dir = { opts.fzf_history_dir, { "string", "boolean", "nil" }, false },
+    frontend = { opts.frontend, { "string" }, false },
   })
 
+  if opts.frontend == "fzf-lua" then
+    opts.mappings.frontend = true
+    opts.commands.frontend = true
+    require("fzfmania.fzf_lua").config(opts.commands, opts.mappings)
+  else
+    opts.mappings.frontend = false
+    opts.commands.frontend = false
+  end
+
   if opts.mappings then
-    require("fzfmania.mappings").config(fzf_actions, opts.mappings)
+    require("fzfmania.mappings").config(opts.mappings)
   end
   if opts.commands then
-    require("fzfmania.commands").config(fzf_actions, opts.commands)
+    require("fzfmania.commands").config(opts.commands)
   end
 
   if opts.fzf_history_dir then
@@ -142,7 +116,7 @@ end
 
 return {
   config = function(opts)
-    opts = vim.tbl_extend("force", defaults, opts)
+    opts = vim.tbl_deep_extend("force", defaults, opts)
     config(opts)
   end,
   config_empty = function(opts)

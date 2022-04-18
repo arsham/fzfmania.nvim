@@ -64,13 +64,16 @@ vim.g.fzf_commits_log_options = table.concat({
 }, " ")
 
 -- stylua: ignore start
-quick.augroup({"FZF_FIX", {--{{{
-  {"FileType", "fzf", run = function()
-      vim.keymap.set("t", "<esc>", "<C-c>",{noremap=true, buffer = true, desc = "escape fzf with escape" })
-    end,
-  },
-}})
---}}}
+local fzf_fix_group = vim.api.nvim_create_augroup("FZF_FIX", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+  group = fzf_fix_group,
+  pattern = "fzf",
+  callback = function()
+    vim.keymap.set( "t", "<esc>", "<C-c>",
+      { buffer = true, desc = "escape fzf with escape" }
+    )
+  end,
+})
 
 local defaults = {
   fzf_history_dir = vim.env.HOME .. "/.local/share/fzf-history",

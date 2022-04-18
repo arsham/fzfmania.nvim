@@ -23,8 +23,7 @@ options you want.
 
 ## Requirements
 
-At the moment it works on the development release of Neovim, and will be
-officially supporting [Neovim 0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0).
+This library supports [Neovim 0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0).
 
 This library depends are the following libraries. Please make sure to add them
 as dependencies in your package manager:
@@ -178,6 +177,7 @@ you can invoke one of these secondary actions:
 | `alt-@` | To search in ctags or lsp symbols. |
 | `alt-:` | To go to a specific line.          |
 | `alt-q` | Add items to the quickfix list.    |
+| `alt-w` | Add items to the local list.       |
 
 Note that if a `LSP` server is not attached to the buffer, it will fall back to
 `ctags`.
@@ -215,7 +215,7 @@ These functions can be imported from the `fzfmania.util` module.
 | `marks`                      | Show marks with preview                                            |
 | `delete_marks`               | Show marks for deletion                                            |
 | `git_grep`                   | Two phase search in all git commits                                |
-| `checkout_branck`            | Checkout a branch                                                  |
+| `checkout_branch`            | Checkout a branch                                                  |
 | `open_todo`                  | Search for all todo/fixme/etc.                                     |
 | `add_args`                   | Find and add files to the args list                                |
 | `delete_args`                | Choose and remove files from the args list                         |

@@ -17,7 +17,7 @@ local executables = {
 }
 
 M.check = function()
-  health.report_start("Listish Health Check")
+  health.report_start("FZFMania Health Check")
   for name, package in pairs(libs) do
     if not pcall(require, name) then
       health.report_error(package .. " was not found", {

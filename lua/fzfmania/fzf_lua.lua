@@ -61,12 +61,6 @@ local function sink_line_number(lines) --{{{
   quick.normal("n", ":")
 end --}}}
 
-local function force_insert_mode()
-  vim.schedule(function()
-    if vim.api.nvim_get_mode().mode ~= "i" then
-      quick.normal("n", "i")
-    end
-  end)
 end
 
 require("fzf-lua").setup({
@@ -158,18 +152,18 @@ require("fzf-lua").setup({
         vim.api.nvim_command(("e %s"):format(file))
         if lsp.is_lsp_attached() and lsp.has_lsp_capability("document_symbol") then
           fzf.lsp_document_symbols({ jump_to_single_result = true })
-          force_insert_mode()
+          actions.ensure_insert_mode()
           return
         end
         nvim.ex.BTags()
-        force_insert_mode()
+        actions.ensure_insert_mode()
       end,
       ["alt-:"] = sink_line_number,
       ["alt-/"] = function(lines)
         local file = lines[1]
         vim.api.nvim_command(("e %s"):format(file))
         fzf.grep_curbuf()
-        force_insert_mode()
+        actions.ensure_insert_mode()
       end,
     }, --}}}
 

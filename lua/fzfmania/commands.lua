@@ -169,6 +169,8 @@ local function config(opts)
     command("Args", fzf.args, { desc = "Browse and delete from arglist" })
     command("Maps", fzf.keymaps, { desc = "Browse the registered keymaps" })
     command("Filetypes", fzf.filetypes, { desc = "Browse the registered filetypes" })
+    command("GitFiles", fzf.git_files, { desc = "Browse the files in git" })
+    command("GFiles", fzf.git_files, { desc = "Browse the files in git" })
   end
 end
 

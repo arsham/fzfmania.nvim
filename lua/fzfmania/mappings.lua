@@ -59,9 +59,12 @@ local function _config(opts)
   end --}}}
 
   if opts.delete_buffers then --{{{
-    vim.keymap.set("n", opts.delete_buffers, function()
-      util.delete_buffers(opts.frontend)
-    end, op("delete buffers"))
+    local o = op("delete buffers")
+    if opts.frontend then
+      vim.keymap.set("n", opts.delete_buffers, util.delete_buffers, o)
+    else
+      vim.keymap.set("n", opts.delete_buffers, util.delete_buffers_native, o)
+    end
   end --}}}
 
   if opts.git_files then --{{{

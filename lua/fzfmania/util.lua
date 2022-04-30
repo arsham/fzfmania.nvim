@@ -109,7 +109,7 @@ function M.ripgrep_search_incremental(term, no_ignore) --{{{
   vim.fn["fzf#vim#grep"](initial, 1, preview)
 end --}}}
 
-local function delete_buffers_native() --{{{
+function M.delete_buffers_native() --{{{
   local list = vim.fn.getbufinfo({ buflisted = 1 })
   local buf_list = {
     table.concat({ "", "", "", "Buffer", "", "Filename", "" }, "\t"),
@@ -173,12 +173,7 @@ local function delete_buffers_native() --{{{
 end --}}}
 
 ---Shows all opened buffers and let you search and delete them.
--- @param frontend? boolean if true it uses fzf-lua
-function M.delete_buffers(frontend) --{{{
-  if not frontend then
-    delete_buffers_native()
-    return
-  end
+function M.delete_buffers() --{{{
   fzf.buffers({
     prompt = "Delete Buffers > ",
     ignore_current_buffer = false,

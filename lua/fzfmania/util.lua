@@ -673,8 +673,23 @@ function M.add_args() --{{{
   })
 end --}}}
 
----Choose and remove files from the args list.
+---Find and add files to the args list.
 function M.delete_args() --{{{
+  fzf.args({
+    prompt = "Choose Files> ",
+    fzf_opts = {
+      ["--exit-0"] = "",
+    },
+    actions = {
+      ["default"] = function(selected)
+        nvim.ex.argd(selected)
+      end,
+    },
+  })
+end --}}}
+
+---Choose and remove files from the args list.
+function M.delete_args_native() --{{{
   local wrapped = vim.fn["fzf#wrap"]({
     source = vim.fn.argv(),
     options = "--multi --bind ctrl-a:select-all+accept",

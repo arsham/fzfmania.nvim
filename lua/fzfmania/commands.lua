@@ -84,9 +84,9 @@ local function config(opts)
   if opts.args_delete then --{{{
     local o = { desc = "Delete from arglist" }
     if opts.frontend then
-      command(opts.args_delete, fzf.args, o)
-    else
       command(opts.args_delete, util.delete_args, o)
+    else
+      command(opts.args_delete, util.delete_args_native, o)
     end
   end --}}}
 

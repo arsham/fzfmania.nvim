@@ -382,7 +382,7 @@ require("fzf-lua").setup({
       -- do not include bufnr in fuzzy matching
       -- tiebreak by line no.
       ["--delimiter"] = "'[\\]:]'",
-      ["--nth"] = "2..",
+      ["--nth"] = "2,4..",
       ["--tiebreak"] = "index",
     },
     winopts = {
@@ -400,7 +400,7 @@ require("fzf-lua").setup({
     fzf_opts = {
       -- hide filename, tiebreak by line no.
       ["--delimiter"] = "'[\\]:]'",
-      ["--with-nth"] = "2..",
+      ["--with-nth"] = "4..",
       ["--tiebreak"] = "index",
       ["--no-multi"] = false,
     },

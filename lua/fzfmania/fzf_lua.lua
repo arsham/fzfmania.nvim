@@ -239,7 +239,7 @@ require("fzf-lua").setup({
 
   git = { --{{{
     files = { --{{{
-      prompt = "GitFiles❯ ",
+      prompt = "Git Files❯ ",
       cmd = "git ls-files --exclude-standard",
       multiprocess = true,
       git_icons = true,
@@ -248,7 +248,7 @@ require("fzf-lua").setup({
     }, --}}}
 
     status = { --{{{
-      prompt = "GitStatus❯ ",
+      prompt = "Git Status❯ ",
       cmd = "git status -s",
       previewer = "git_diff",
       file_icons = true,
@@ -270,7 +270,7 @@ require("fzf-lua").setup({
     }, --}}}
 
     bcommits = { --{{{
-      prompt = "BCommits❯ ",
+      prompt = "Buffer Commits❯ ",
       cmd = "git log --pretty=oneline --abbrev-commit --color",
       preview = "git show --pretty='%Cred%H%n%Cblue%an%n%Cgreen%s' --color {1}",
       actions = {
@@ -375,7 +375,7 @@ require("fzf-lua").setup({
 
   lines = { --{{{
     previewer = "builtin",
-    prompt = "Lines❯ ",
+    prompt = "Open Buffer Lines❯ ",
     show_unlisted = false, -- exclude 'help' buffers
     no_term_buffers = true,
     fzf_opts = {
@@ -394,7 +394,7 @@ require("fzf-lua").setup({
 
   blines = { --{{{
     previewer = "builtin",
-    prompt = "BLines❯ ",
+    prompt = "Buffer Lines❯ ",
     show_unlisted = true,
     no_term_buffers = false,
     fzf_opts = {

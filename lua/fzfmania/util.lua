@@ -657,10 +657,9 @@ local function add_args_native() --{{{
 end --}}}
 
 ---Find and add files to the args list.
--- @param frontend? boolean if true it uses the fzf-lua interface.
 function M.add_args() --{{{
   fzf.files({
-    prompt = "Choose Files > ",
+    prompt = "Choose Files> ",
     -- fzf_opts = {
     --   ["--header"] = "'" .. table.concat({ "Buffer", "", "Filename", "" }, "\t") .. "'",
     -- },

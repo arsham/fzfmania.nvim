@@ -150,7 +150,7 @@ require("fzf-lua").setup({
       ["alt-@"] = function(lines)
         local file = lines[1]
         vim.api.nvim_command(("e %s"):format(file))
-        if lsp.is_lsp_attached() and lsp.has_lsp_capability("document_symbol") then
+        if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
           fzf.lsp_document_symbols({ jump_to_single_result = true })
           actions.ensure_insert_mode()
           return

@@ -721,7 +721,7 @@ end --}}}
 function M.goto_def(lines) --{{{
   local file = lines[1]
   vim.api.nvim_command(("e %s"):format(file))
-  if lsp.is_lsp_attached() and lsp.has_lsp_capability("document_symbol") then
+  if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
     local ok = pcall(vim.lsp.buf.document_symbol)
     if ok then
       return

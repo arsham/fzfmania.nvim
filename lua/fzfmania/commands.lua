@@ -91,19 +91,20 @@ local function config(opts)
   end --}}}
 
   if opts.history then --{{{
+    local desc = "Browse file history"
     if opts.frontend then
-      command(opts.history, fzf.oldfiles)
+      command(opts.history, fzf.oldfiles, { desc = desc })
     else
       command(opts.history, function()
         vim.fn["fzf#vim#history"](vim.fn["fzf#vim#with_preview"]({
           options = "--no-sort",
         }))
-      end, { bang = true, nargs = "*" })
+      end, { bang = true, nargs = "*", desc = desc })
     end
   end --}}}
 
   if opts.checkout then --{{{
-    local o = { bang = true, nargs = 0 }
+    local o = { bang = true, nargs = 0, desc = "Checkout a branch" }
     if opts.frontend then
       command(opts.checkout, fzf.git_branches, o)
     else
@@ -112,7 +113,7 @@ local function config(opts)
   end --}}}
 
   if opts.work_tree then --{{{
-    ---Switch git worktrees. It creates a new tab in the new location.
+    local o = { desc = "Switch git worktrees. It creates a new tab in the new location" }
     command(opts.work_tree, function()
       local cmd = "git worktree list | cut -d' ' -f1"
       local wrapped = vim.fn["fzf#wrap"]({
@@ -124,7 +125,7 @@ local function config(opts)
         nvim.ex.tcd(dir[2])
       end
       vim.fn["fzf#run"](wrapped)
-    end)
+    end, o)
   end --}}}
 
   if opts.git_status then --{{{
@@ -143,20 +144,23 @@ local function config(opts)
   end --}}}
 
   if opts.jumps then --{{{
+    local o = { desc = "Browse jumps" }
     if opts.frontend then
-      command(opts.jumps, fzf.jumps)
+      command(opts.jumps, fzf.jumps, o)
     end
   end --}}}
 
   if opts.changes then --{{{
+    local o = { desc = "Browse changes" }
     if opts.frontend then
-      command(opts.changes, fzf.changes)
+      command(opts.changes, fzf.changes, o)
     end
   end --}}}
 
   if opts.registers then --{{{
+    local o = { desc = "View registers" }
     if opts.frontend then
-      command(opts.registers, fzf.registers)
+      command(opts.registers, fzf.registers, o)
     end
   end --}}}
 

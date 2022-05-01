@@ -103,8 +103,9 @@ local function _config(opts)
 
   if opts.complete_dict then --{{{
     -- Replace the default dictionary completion with fzf-based fuzzy completion.
-    local command = [[fzf#vim#complete('cat /usr/share/dict/words-insane')]]
-    vim.keymap.set("i", "<c-x><c-k>", command, op("Dict completion"))
+    vim.keymap.set("i", "<c-x><c-k>", function()
+      vim.fn["fzf#vim#complete"]("cat /usr/share/dict/words-insane")
+    end, op("Dict completion"))
   end --}}}
 
   if opts.complete_path then --{{{

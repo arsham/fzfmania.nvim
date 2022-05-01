@@ -624,13 +624,13 @@ function M.open_todo(extra_terms) --{{{
 end --}}}
 
 ---Find and add files to the args list using fzf.vim native interface.
-local function add_args_native() --{{{
-  local seen = _t()
+function M.add_args_native() --{{{
+  local seen = _t({})
   _t(vim.fn.argv()):map(function(v)
     seen[v] = true
   end)
 
-  local files = _t()
+  local files = _t({})
   _t(vim.fn.systemlist({ "fd", ".", "-t", "f" }))
     :map(function(v)
       return v:gsub("^./", "")

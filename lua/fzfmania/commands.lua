@@ -135,7 +135,11 @@ local function config(opts)
 
   if opts.autocmds then --{{{
     local o = { bang = true, nargs = 0, desc = "Show all autocmds" }
-    command(opts.autocmds, util.autocmds, o)
+    if opts.frontend then
+      command(opts.autocmds, util.autocmds, o)
+    else
+      command(opts.autocmds, util.autocmds_native, o)
+    end
   end --}}}
 
   if opts.jumps then --{{{

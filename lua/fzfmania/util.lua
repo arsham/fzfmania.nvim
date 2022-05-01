@@ -9,6 +9,8 @@ local fzf = require("fzf-lua")
 local fzfcore = require("fzf-lua.core")
 local fzfutils = require("fzf-lua.utils")
 local fzfconfig = require("fzf-lua.config")
+local fzfactions = require("fzf-lua.actions")
+local fzfbuiltin = require("fzf-lua.previewer.builtin")
 
 local M = {}
 
@@ -739,7 +741,7 @@ function M.goto_def(lines) --{{{
   nvim.ex.BTags()
 end --}}}
 
-function M.autocmds() --{{{
+function M.autocmds_native() --{{{
   local autocmds = vim.api.nvim_get_autocmds({})
   local source = {}
   for _, item in pairs(autocmds) do
@@ -773,12 +775,97 @@ function M.autocmds() --{{{
   vim.fn["fzf#run"](wrapped)
 end --}}}
 
+local autocmd_previewer = { _values = {} } --{{{
+autocmd_previewer.base = fzfbuiltin.base
+
+function autocmd_previewer:new(o, opts, fzf_win) --{{{
+  self = setmetatable(autocmd_previewer.base(o, opts, fzf_win), {
+    __index = vim.tbl_deep_extend("keep", self, autocmd_previewer.base),
+  })
+
+  local list = vim.api.nvim_get_autocmds({})
+  for _, item in ipairs(list) do
+    local row = {
+      event = item.event,
+      is_buf = item.buflocal,
+      is_once = item.once,
+      pattern = item.pattern,
+      command = item.command,
+      desc = item.desc,
+    }
+    table.insert(autocmd_previewer._values, row)
+  end
+  return self
+end --}}}
+
+function autocmd_previewer:parse_entry(entry_str) --{{{
+  local idx = tonumber(entry_str:match("^(%d+)"))
+  return autocmd_previewer._values[idx]
+end --}}}
+
+function autocmd_previewer:populate_preview_buf(entry_str) --{{{
+  local entry = self:parse_entry(entry_str)
+  self.preview_bufloaded = true
+  local e = {
+    event = entry.raw_event,
+    buflocal = entry.is_buf,
+    once = entry.is_once,
+    pattern = entry.raw_pattern,
+    command = entry.command,
+    desc = entry.desc,
+  }
+  local lines = vim.split(vim.inspect(e), "\n")
+  vim.api.nvim_buf_set_lines(self.preview_bufnr, 0, -1, false, lines)
+  local filetype = "lua"
+  vim.api.nvim_buf_set_option(self.preview_bufnr, "filetype", filetype)
+  self.win:update_scrollbar()
+end --}}}
+--}}}
+
+function M.autocmds() --{{{
+  local red = fzfutils.ansi_codes.red
+  local yellow = fzfutils.ansi_codes.yellow
+  local blue = fzfutils.ansi_codes.blue
+  local green = fzfutils.ansi_codes.green
+  local grey = fzfutils.ansi_codes.grey
+
+  local fn = function(fzf_cb) --{{{
+    for i, entry in ipairs(autocmd_previewer._values) do
+      local buf = entry.is_buf and red("BUF") or grey("   ")
+      local once = entry.is_once and yellow("ONCE") or grey("    ")
+      local desc = entry.desc or entry.command
+      local e = {
+        i,
+        buf,
+        once,
+        blue(entry.event),
+        green(entry.pattern),
+        desc,
+      }
+      fzf_cb(table.concat(e, "\t"))
+    end
+    fzf_cb(nil)
+  end
+
+  local actions = {
+    ["default"] = function() end,
+  } --}}}
+
+  coroutine.wrap(function()
+    local selected = require("fzf-lua").fzf({
+      prompt = "Autocmds❯ ",
+      previewer = autocmd_previewer,
+      actions = actions,
+      fzf_opts = {
+        ["--with-nth"] = "2..",
+      },
+    }, fn)
+    require("fzf-lua").actions.act(actions, selected, {})
+  end)()
+end --}}}
+
 function M.jumps(opts) --{{{
-  local config = require("fzf-lua.config")
-  local utils = require("fzf-lua.utils")
-  local core = require("fzf-lua.core")
-  local actions = require("fzf-lua.actions")
-  opts = config.normalize_opts(opts, config.globals.nvim.jumps)
+  opts = fzfconfig.normalize_opts(opts, fzfconfig.globals.nvim.jumps)
   if not opts then
     return
   end
@@ -793,9 +880,9 @@ function M.jumps(opts) --{{{
       entries,
       string.format(
         "%-15s %-15s %-15s %s",
-        utils.ansi_codes.yellow(jump),
-        utils.ansi_codes.blue(line),
-        utils.ansi_codes.green(col),
+        fzfutils.ansi_codes.yellow(jump),
+        fzfutils.ansi_codes.blue(line),
+        fzfutils.ansi_codes.green(col),
         text
       )
     )
@@ -803,11 +890,11 @@ function M.jumps(opts) --{{{
 
   opts.fzf_opts["--no-multi"] = ""
 
-  core.fzf_wrap(opts, entries, function(selected)
+  fzfcore.fzf_wrap(opts, entries, function(selected)
     if not selected then
       return
     end
-    actions.act(opts.actions, selected, opts)
+    fzfactions.act(opts.actions, selected, opts)
   end)()
 end --}}}
 

@@ -216,28 +216,65 @@ local function _config(opts)
   end --}}}
 
   if opts.current_word then --{{{
+    local current_word = opts.current_word
+    local current_word_names = nil
+    if type(current_word) == "table" then
+      current_word_names = current_word[2]
+      current_word = current_word[1]
+    end
+
     local o = { desc = "Search over current word" }
     if opts.frontend then
-      vim.keymap.set("n", opts.current_word, fzfgrep.grep_cword, o)
+      vim.keymap.set("n", current_word, function()
+        fzfgrep.grep_cword({ fzf_opts = { ["--nth"] = "2.." } })
+      end, o)
+      if current_word_names then
+        vim.keymap.set("n", current_word_names, fzfgrep.grep_cword, o)
+      end
     else
-      vim.keymap.set("n", opts.current_word, function()
+      vim.keymap.set("n", current_word, function()
         util.ripgrep_search(vim.fn.expand("<cword>"))
       end, o)
+      if current_word_names then
+        vim.keymap.set("n", current_word_names, function()
+          util.ripgrep_search(vim.fn.expand("<cword>"), false, true)
+        end, o)
+      end
     end
   end --}}}
 
   if opts.current_word_force then --{{{
+    local current_word_force = opts.current_word_force
+    local current_word_force_names = nil
+    if type(current_word_force) == "table" then
+      current_word_force_names = current_word_force[2]
+      current_word_force = current_word_force[1]
+    end
+
     local o = { desc = "Search over current word (ignore .gitignore)" }
     if opts.frontend then
-      vim.keymap.set("n", opts.current_word_force, function()
+      vim.keymap.set("n", current_word_force, function()
         fzfgrep.grep_cword({
           rg_opts = "--no-ignore",
+          fzf_opts = { ["--nth"] = "2.." },
         })
       end, o)
+      if current_word_force_names then
+        vim.keymap.set("n", current_word_force_names, function()
+          fzfgrep.grep_cword({
+            rg_opts = "--no-ignore",
+          })
+        end, o)
+      end
     else
-      vim.keymap.set("n", opts.current_word_force, function()
+      vim.keymap.set("n", current_word_force, function()
         util.ripgrep_search(vim.fn.expand("<cword>"), true)
       end, o)
+      if current_word_force_names then
+        vim.keymap.set("n", current_word_force_names, function()
+          util.ripgrep_search(vim.fn.expand("<cword>"), true, true)
+        end, o)
+      end
     end
   end --}}}
 

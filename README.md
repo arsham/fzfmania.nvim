@@ -153,8 +153,14 @@ Here is a list of default configurations:
       "<leader>fA",                    -- find in files (ignore .gitignore) with filtering filenames
     },
     incremental_search = "<leader>fi", -- Incremental search with rg
-    current_word       = "<leader>rg", -- Search for current word
-    current_word_force = "<leader>ra", -- Search for current word (ignore .gitignore)
+    current_word       = {
+      "<leader>rg",                    -- search for current word
+      "<leader>rG",                    -- search for current word with filtering filenames
+    },
+    current_word_force = {
+      "<leader>ra",                    -- search for current word (ignore .gitignore)
+      "<leader>rA",                    -- search for current word (ignore .gitignore) with filtering filenames
+    },
     marks              = "<leader>mm", -- Show marks
     tags               = "<leader>@",  -- Show tags
     fzf_builtin        = "<leader>t"   -- Invokes fzf-lua builtin popup

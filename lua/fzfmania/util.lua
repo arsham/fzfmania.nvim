@@ -17,14 +17,19 @@ local M = {}
 ---Launches a ripgrep search with a fzf search interface.
 ---@param term? string if empty, the search will only happen on the content.
 ---@param no_ignore? boolean disables the ignore rules.
-function M.ripgrep_search(term, no_ignore) --{{{
+---@param filenames? boolean let the search on filenames too.
+function M.ripgrep_search(term, no_ignore, filenames) --{{{
   term = vim.fn.shellescape(term)
   local nth = ""
   local with_nth = ""
   local delimiter = ""
   if term then
-    with_nth = "--nth 2.."
-    nth = "--nth 1,4.."
+    with_nth = "--with-nth 1.."
+    if filenames then
+      nth = "--nth 1,4.."
+    else
+      nth = "--nth 4.."
+    end
     delimiter = "--delimiter :"
   end
   no_ignore = no_ignore and "" or "--no-ignore"

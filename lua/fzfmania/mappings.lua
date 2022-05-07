@@ -139,29 +139,66 @@ local function _config(opts)
   end --}}}
 
   if opts.in_files then --{{{
+    local in_files = opts.in_files
+    local in_files_names = nil
+    if type(in_files) == "table" then
+      in_files_names = in_files[2]
+      in_files = in_files[1]
+    end
+
     local o = { desc = "Find in files" }
     if opts.frontend then
-      vim.keymap.set("n", opts.in_files, fzf.grep_project, o)
+      vim.keymap.set("n", in_files, fzf.grep_project, o)
+      if in_files_names then
+        vim.keymap.set("n", in_files_names, function()
+          fzf.grep_project({ fzf_opts = { ["--nth"] = "1.." } })
+        end, o)
+      end
     else
-      vim.keymap.set("n", opts.in_files, function()
-        util.ripgrep_search("")
-      end, o)
+      vim.keymap.set("n", in_files, util.ripgrep_search, o)
+      if in_files_names then
+        vim.keymap.set("n", in_files_names, function()
+          util.ripgrep_search("", false, true)
+        end, o)
+      end
     end
   end --}}}
 
   if opts.in_files_force then --{{{
+    local in_files_force = opts.in_files_force
+    local in_files_force_name = nil
+    if type(in_files_force) == "table" then
+      in_files_force_name = in_files_force[2]
+      in_files_force = in_files_force[1]
+    end
+
     local o = { desc = "Find in files (ignore .gitignore)" }
     if opts.frontend then
-      vim.keymap.set("n", opts.in_files_force, function()
+      vim.keymap.set("n", in_files_force, function()
         fzf.grep({
           search = "",
           rg_opts = "--no-ignore",
+          fzf_opts = { ["--nth"] = "2.." },
         })
       end, o)
+      if in_files_force_name then
+        vim.keymap.set("n", in_files_force_name, function()
+          fzf.grep({
+            search = "",
+            rg_opts = "--no-ignore",
+            fzf_opts = { ["--nth"] = "1.." },
+          })
+        end, o)
+      end
     else
-      vim.keymap.set("n", opts.in_files_force, function()
+      vim.keymap.set("n", in_files_force, function()
         util.ripgrep_search("", true)
       end, o)
+      if in_files_force_name then
+        vim.keymap.set("n", in_files_force_name, function()
+          util.ripgrep_search("", true, true)
+        end, o)
+      end
     end
   end --}}}
 

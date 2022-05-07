@@ -52,8 +52,14 @@ local defaults = {
     complete_path      = "<c-x><c-f>", -- (Insert mode) path completion
     complete_line      = "<c-x><c-l>", -- (Insert mode) line completion
     spell_suggestion   = "z=",         -- show spell suggestions
-    in_files           = "<leader>ff", -- find in files
-    in_files_force     = "<leader>fa", -- find in files (ignore .gitignore)
+    in_files           = {
+      "<leader>ff",                    -- find in files
+      "<leader>fF",                    -- find in files with filtering filenames
+    },
+    in_files_force     = {
+      "<leader>fa",                    -- find in files (ignore .gitignore)
+      "<leader>fA",                    -- find in files (ignore .gitignore) with filtering filenames
+    },
     incremental_search = "<leader>fi", -- incremental search with rg
     current_word       = "<leader>rg", -- search for current word
     current_word_force = "<leader>ra", -- search for current word (ignore .gitignore)

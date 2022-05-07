@@ -105,6 +105,21 @@ require("fzfmania").config_empty({
 Note that you also want to set the `fzf_actions`, they will become disabled if
 you use the `config_empty` function.
 
+Some mappings can be in form of a string or a table. If you provide a string,
+it only creates the map for when you **can't** filter by filenames. If you
+provide a table with two values, the first one doesn't filter by filenames,
+and the second one will do. In these cases, I have chosen the capitalised
+second letter for enabling file names filtering. For example:
+
+```lua
+in_files = {
+  "<leader>ff", -- doesn't filter filenames as you type
+  "<leader>fF", -- filters filenames too as you type.
+},
+-- or
+in_files = "<leader>ff" -- only this version is available.
+```
+
 Here is a list of default configurations:
 
 ```lua
@@ -129,8 +144,14 @@ Here is a list of default configurations:
     complete_path      = "<c-x><c-f>", -- (Insert mode) path completion
     complete_line      = "<c-x><c-l>", -- (Insert mode) line completion
     spell_suggestion   = "z=",         -- Show spell suggestions
-    in_files           = "<leader>ff", -- Find in files
-    in_files_force     = "<leader>fa", -- Find in files (ignore .gitignore)
+    in_files           = {             -- if it's a string, only the first mapping is made
+      "<leader>ff",                    -- find in files
+      "<leader>fF",                    -- find in files with filtering filenames
+    },
+    in_files_force     = {
+      "<leader>fa",                    -- find in files (ignore .gitignore)
+      "<leader>fA",                    -- find in files (ignore .gitignore) with filtering filenames
+    },
     incremental_search = "<leader>fi", -- Incremental search with rg
     current_word       = "<leader>rg", -- Search for current word
     current_word_force = "<leader>ra", -- Search for current word (ignore .gitignore)

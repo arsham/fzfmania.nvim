@@ -1,4 +1,3 @@
-local nvim = require("nvim")
 local fs = require("arshlib.fs")
 local colour = require("arshlib.colour")
 local quick = require("arshlib.quick")
@@ -14,12 +13,16 @@ local fzfbuiltin = require("fzf-lua.previewer.builtin")
 
 local M = {}
 
+local function nvim_command(cmd, args)
+  vim.api.nvim_command(cmd .. table.concat(args, " "))
+end
+
 ---Launches a ripgrep search with a fzf search interface.
 ---@param term? string if empty, the search will only happen on the content.
 ---@param no_ignore? boolean disables the ignore rules.
 ---@param filenames? boolean let the search on filenames too.
 function M.ripgrep_search(term, no_ignore, filenames) --{{{
-  term = vim.fn.shellescape(term)
+  term = vim.fn.shellescape(term or "")
   local nth = ""
   local with_nth = ""
   local delimiter = ""
@@ -350,7 +353,7 @@ function M.open_config() --{{{
   preview["sink"] = function(filename)
     filename = filename:match("^[^\t]*")
     if filename ~= "" then
-      nvim.ex.edit(filename)
+      vim.api.nvim_command("edit " .. filename)
     end
   end
   vim.fn["fzf#run"](preview)
@@ -422,7 +425,7 @@ function M.delete_marks_native() --{{{
   preview["sink*"] = function(names)
     _t(names):slice(2):map(function(name)
       local mark = string.match(name, "^[^\t]+\t(%a)")
-      nvim.ex.delmarks(mark)
+      vim.api.nvim_command("delmarks " .. mark)
     end)
   end
   vim.fn["fzf#run"](preview)
@@ -469,7 +472,7 @@ function M.delete_marks() --{{{
   fzfcore.fzf_wrap(opts, entries, function(selected)
     for _, name in ipairs(selected) do
       local mark = string.match(name, "^(%a)")
-      nvim.ex.delmarks(mark)
+      vim.api.nvim_command("delmarks " .. mark)
     end
   end)()
 end -- }}}
@@ -522,7 +525,7 @@ function M.git_grep(term) --{{{
         local toplevel = vim.fn.system("git rev-parse --show-toplevel")
         toplevel = string.gsub(toplevel, "\n", "")
         local str = string.format([[fugitive://%s/.git//%s]], toplevel, sha)
-        nvim.ex.edit(str)
+        vim.api.nvim_command("edit " .. str)
       end
     end
   end
@@ -570,7 +573,7 @@ function M.git_tree() --{{{
       local toplevel = vim.fn.system("git rev-parse --show-toplevel")
       toplevel = string.gsub(toplevel, "\n", "")
       local str = string.format([[fugitive://%s/.git//%s]], toplevel, sha)
-      nvim.ex.edit(str)
+      vim.api.nvim_command("edit " .. str)
     end
   end
   vim.fn["fzf#run"](wrapped)
@@ -658,7 +661,7 @@ function M.add_args_native() --{{{
     options = "--multi --bind ctrl-a:select-all+accept",
   })
   wrapped["sink*"] = function(lines)
-    nvim.ex.arga(lines)
+    nvim_command("arga", lines)
   end
   vim.fn["fzf#run"](wrapped)
 end --}}}
@@ -673,7 +676,7 @@ function M.add_args() --{{{
     fd_opts = "--color=never --type f --hidden --follow --exclude .git",
     actions = {
       ["default"] = function(selected)
-        nvim.ex.arga(selected)
+        nvim_command("arga", selected)
       end,
     },
   })
@@ -688,7 +691,7 @@ function M.delete_args() --{{{
     },
     actions = {
       ["default"] = function(selected)
-        nvim.ex.argd(selected)
+        nvim_command("argd", selected)
       end,
     },
   })
@@ -701,7 +704,7 @@ function M.delete_args_native() --{{{
     options = "--multi --bind ctrl-a:select-all+accept",
   })
   wrapped["sink*"] = function(lines)
-    nvim.ex.argd(lines)
+    nvim_command("argd", lines)
   end
   vim.fn["fzf#run"](wrapped)
 end --}}}
@@ -743,7 +746,7 @@ function M.goto_def(lines) --{{{
       return
     end
   end
-  nvim.ex.BTags()
+  vim.api.nvim_command("BTags")
 end --}}}
 
 function M.autocmds_native() --{{{
@@ -922,14 +925,14 @@ end --}}}
 ---@param items string[]|table[]
 local function set_qf_list(items) --{{{
   M.insert_into_list(items, false)
-  nvim.ex.copen()
+  vim.api.nvim_command("copen")
 end --}}}
 
 ---Set selected lines in the local list with fzf search.
 ---@param items string[]|table[]
 local function set_loclist(items) --{{{
   M.insert_into_list(items, true)
-  nvim.ex.lopen()
+  vim.api.nvim_command("lopen")
 end --}}}
 
 M.fzf_actions = { --{{{

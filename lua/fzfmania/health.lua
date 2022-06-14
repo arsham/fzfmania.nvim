@@ -1,11 +1,10 @@
 local M = {}
-local health = require("health")
+local health = vim.health or require("health")
 
 local libs = {
   arshlib = "arsham/arshlib.nvim",
   listish = "arsham/listish.nvim",
   plenary = "nvim-lua/plenary.nvim",
-  nvim = "norcalli/nvim.lua",
   ["fzf-lua"] = "ibhagwan/fzf-lua",
 }
 

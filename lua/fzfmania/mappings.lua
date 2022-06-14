@@ -1,4 +1,3 @@
-local nvim = require("nvim")
 local util = require("fzfmania.util")
 local fzf_cmd = require("fzf-lua.cmd")
 local fzf = require("fzf-lua")
@@ -288,7 +287,9 @@ local function _config(opts)
   end --}}}
 
   if opts.tags then --{{{
-    vim.keymap.set("n", opts.tags, nvim.ex.BTags, op("Show tags"))
+    vim.keymap.set("n", opts.tags, function()
+      vim.api.nvim_command("BTags")
+    end, op("Show tags"))
   end --}}}
 end
 

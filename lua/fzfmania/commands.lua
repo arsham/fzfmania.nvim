@@ -1,4 +1,3 @@
-local nvim = require("nvim")
 local util = require("fzfmania.util")
 local command = require("arshlib.quick").command
 local fzf = require("fzf-lua")
@@ -121,8 +120,8 @@ local function config(opts)
         options = { "--no-multi" },
       })
       wrapped["sink*"] = function(dir)
-        nvim.ex.tabnew()
-        nvim.ex.tcd(dir[2])
+        vim.api.nvim_command("tabnew")
+        vim.api.nvim_command("tcd " .. dir[2])
       end
       vim.fn["fzf#run"](wrapped)
     end, o)

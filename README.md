@@ -23,7 +23,8 @@ options you want.
 
 ## Requirements
 
-This library supports [Neovim 0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0).
+This library supports [Neovim
+0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0) or newer.
 
 This library depends are the following libraries. Please make sure to add them
 as dependencies in your package manager:
@@ -33,7 +34,6 @@ as dependencies in your package manager:
 | [arshlib.nvim](https://github.com/arsham/arshlib.nvim)   | common library            |
 | [listish.nvim](https://github.com/arsham/listish.nvim)   | for sinking to lists      |
 | [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) |                           |
-| [nvim.lua](https://github.com/norcalli/nvim.lua)         |                           |
 | [fzf.vim](https://github.com/junegunn/fzf.vim)           |                           |
 | [fzf-lua](https://github.com/ibhagwan/fzf-lua)           | (Optional) for better ui  |
 | [fd](https://github.com/sharkdp/fd)                      | fast file find            |

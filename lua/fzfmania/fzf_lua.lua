@@ -60,8 +60,6 @@ local function sink_line_number(lines) --{{{
   quick.normal("n", ":")
 end --}}}
 
-end
-
 require("fzf-lua").setup({
   winopts = { --{{{
     height = 0.5,

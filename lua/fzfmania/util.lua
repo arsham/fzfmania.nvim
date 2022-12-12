@@ -750,26 +750,28 @@ function M.goto_def(lines) --{{{
 end --}}}
 
 function M.autocmds_native() --{{{
-  local autocmds = vim.api.nvim_get_autocmds({})
+  local list = vim.api.nvim_get_autocmds({})
   local source = {}
-  for _, item in pairs(autocmds) do
-    local buf = item.buflocal and colour.ansi_color(colour.colours.red, "BUF") or ""
-    local once = item.once and colour.ansi_color(colour.colours.yellow, "ONCE") or ""
-    local line = table.concat({
-      colour.ansi_color(colour.colours.blue, item.event),
-      buf .. once,
-      colour.ansi_color(colour.colours.green, item.pattern),
-      item.command,
-    }, "\t")
-    table.insert(source, line)
+  for _, item in ipairs(list) do
+    local row = {
+      group = item.group_name or "",
+      event = item.event,
+      is_buf = item.buflocal,
+      is_once = item.once,
+      pattern = item.pattern,
+      command = item.command,
+      desc = item.desc,
+    }
+    table.insert(source, row)
   end
 
   local wrapped = vim.fn["fzf#wrap"]({
     source = source,
     options = table.concat({
-      '--prompt "Search Term > "',
-      "--header 'Event\tBuffer/Once\tPattern\tCommand'",
+      '--prompt "Autocmds> "',
+      "--header 'Group\tEvent\tBuffer/Once\tPattern\tCommand'",
       "+m",
+      "--with-nth=2..",
       "--exit-0",
       "--ansi",
       "--delimiter '\t'",
@@ -783,7 +785,12 @@ function M.autocmds_native() --{{{
   vim.fn["fzf#run"](wrapped)
 end --}}}
 
-local autocmd_previewer = { _values = {} } --{{{
+local autocmd_previewer = {
+  _values = {},
+  group_max = 0,
+  event_max = 0,
+  pattern_max = 0,
+} --{{{
 autocmd_previewer.base = fzfbuiltin.base
 
 function autocmd_previewer:new(o, opts, fzf_win) --{{{
@@ -794,6 +801,7 @@ function autocmd_previewer:new(o, opts, fzf_win) --{{{
   local list = vim.api.nvim_get_autocmds({})
   for _, item in ipairs(list) do
     local row = {
+      group = item.group_name or "",
       event = item.event,
       is_buf = item.buflocal,
       is_once = item.once,
@@ -802,6 +810,18 @@ function autocmd_previewer:new(o, opts, fzf_win) --{{{
       desc = item.desc,
     }
     table.insert(autocmd_previewer._values, row)
+    local len = #row.group
+    if len > autocmd_previewer.group_max then
+      autocmd_previewer.group_max = len
+    end
+    len = #row.event
+    if len > autocmd_previewer.event_max then
+      autocmd_previewer.event_max = len
+    end
+    len = #row.pattern
+    if len > autocmd_previewer.pattern_max then
+      autocmd_previewer.pattern_max = len
+    end
   end
   return self
 end --}}}
@@ -815,16 +835,17 @@ function autocmd_previewer:populate_preview_buf(entry_str) --{{{
   local entry = self:parse_entry(entry_str)
   self.preview_bufloaded = true
   local e = {
-    event = entry.raw_event,
+    group = entry.group,
+    event = entry.event,
     buflocal = entry.is_buf,
     once = entry.is_once,
-    pattern = entry.raw_pattern,
+    pattern = entry.pattern,
     command = entry.command,
     desc = entry.desc,
   }
-  local lines = vim.split(vim.inspect(e), "\n")
+  local lines = vim.split(vim.inspect(e) .. "\n\n" .. entry.command, "\n")
   vim.api.nvim_buf_set_lines(self.preview_bufnr, 0, -1, false, lines)
-  local filetype = "lua"
+  local filetype = "vim"
   vim.api.nvim_buf_set_option(self.preview_bufnr, "filetype", filetype)
   self.win:update_scrollbar()
 end --}}}
@@ -833,21 +854,28 @@ end --}}}
 function M.autocmds() --{{{
   local red = fzfutils.ansi_codes.red
   local yellow = fzfutils.ansi_codes.yellow
-  local blue = fzfutils.ansi_codes.blue
+  local magenta = fzfutils.ansi_codes.magenta
   local green = fzfutils.ansi_codes.green
   local grey = fzfutils.ansi_codes.grey
+  local cyan = fzfutils.ansi_codes.cyan
 
   local fn = function(fzf_cb) --{{{
     for i, entry in ipairs(autocmd_previewer._values) do
       local buf = entry.is_buf and red("BUF") or grey("   ")
       local once = entry.is_once and yellow("ONCE") or grey("    ")
       local desc = entry.desc or entry.command
+      local padding = autocmd_previewer.group_max - #entry.group
+      local group_name = entry.group .. string.rep(" ", padding)
+      padding = autocmd_previewer.event_max - #entry.event
+      local event_name = entry.event .. string.rep(" ", padding)
+      padding = autocmd_previewer.pattern_max - #entry.pattern
+      local pattern_name = entry.pattern .. string.rep(" ", padding)
+
       local e = {
         i,
-        buf,
-        once,
-        blue(entry.event),
-        green(entry.pattern),
+        green(group_name) .. " " .. magenta(event_name),
+        buf .. " " .. once,
+        cyan(pattern_name),
         desc,
       }
       fzf_cb(table.concat(e, "\t"))
@@ -860,15 +888,21 @@ function M.autocmds() --{{{
   } --}}}
 
   coroutine.wrap(function()
-    local selected = require("fzf-lua").fzf({
+    local selected = fzf.fzf(fn, {
       prompt = "Autocmds❯ ",
       previewer = autocmd_previewer,
       actions = actions,
       fzf_opts = {
         ["--with-nth"] = "2..",
+        ["--header"] = "'Group\tEvent\tBuffer/Once\tPattern\tCommand'",
       },
-    }, fn)
-    require("fzf-lua").actions.act(actions, selected, {})
+      winopts = {
+        preview = {
+          hidden = "hidden",
+        },
+      },
+    })
+    fzf.actions.act(actions, selected, {})
   end)()
 end --}}}
 

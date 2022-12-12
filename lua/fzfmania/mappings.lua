@@ -145,12 +145,14 @@ local function _config(opts)
       in_files = in_files[1]
     end
 
-    local o = { desc = "Find in files" }
+    local o = { desc = "Find in files" .. frontend }
     if opts.frontend then
-      vim.keymap.set("n", in_files, fzf.grep_project, o)
+      vim.keymap.set("n", in_files, function()
+        fzf.grep({ search = "", fzf_opts = { ["--nth"] = "2..", ["--delimiter"] = "'[:]'" } })
+      end, o)
       if in_files_names then
         vim.keymap.set("n", in_files_names, function()
-          fzf.grep_project({ fzf_opts = { ["--nth"] = "1.." } })
+          fzf.grep({ search = "", fzf_opts = { ["--nth"] = "1.." } })
         end, o)
       end
     else
@@ -176,16 +178,15 @@ local function _config(opts)
       vim.keymap.set("n", in_files_force, function()
         fzf.grep({
           search = "",
-          rg_opts = "--no-ignore",
-          fzf_opts = { ["--nth"] = "2.." },
+          rg_opts = "--no-ignore --column --line-number --no-heading --color=always --smart-case --max-columns=512",
+          fzf_opts = { ["--nth"] = "2..", ["--delimiter"] = "'[:]'" },
         })
       end, o)
       if in_files_force_name then
         vim.keymap.set("n", in_files_force_name, function()
           fzf.grep({
             search = "",
-            rg_opts = "--no-ignore",
-            fzf_opts = { ["--nth"] = "1.." },
+            rg_opts = "--no-ignore --column --line-number --no-heading --color=always --smart-case --max-columns=512",
           })
         end, o)
       end
@@ -225,7 +226,9 @@ local function _config(opts)
     local o = { desc = "Search over current word" }
     if opts.frontend then
       vim.keymap.set("n", current_word, function()
-        fzfgrep.grep_cword({ fzf_opts = { ["--nth"] = "2.." } })
+        fzfgrep.grep_cword({
+          fzf_opts = { ["--nth"] = "2..", ["--delimiter"] = "'[:]'" },
+        })
       end, o)
       if current_word_names then
         vim.keymap.set("n", current_word_names, fzfgrep.grep_cword, o)
@@ -254,14 +257,15 @@ local function _config(opts)
     if opts.frontend then
       vim.keymap.set("n", current_word_force, function()
         fzfgrep.grep_cword({
-          rg_opts = "--no-ignore",
-          fzf_opts = { ["--nth"] = "2.." },
+          rg_opts = "--no-ignore --column --line-number --no-heading --color=always --smart-case --max-columns=512",
+          fzf_opts = { ["--nth"] = "2..", ["--delimiter"] = "'[:]'" },
         })
       end, o)
       if current_word_force_names then
         vim.keymap.set("n", current_word_force_names, function()
           fzfgrep.grep_cword({
-            rg_opts = "--no-ignore",
+            rg_opts = "--no-ignore --column --line-number --no-heading --color=always --smart-case --max-columns=512",
+            fzf_opts = { ["--delimiter"] = "'[:]'" },
           })
         end, o)
       end

@@ -224,8 +224,8 @@ require("fzf-lua").setup({
     file_icons = true,
     color_icons = true,
     find_opts = [[-type f -not -path '*/\.git/*' -printf '%P\n']],
-    rg_opts = "--color=never --files --hidden --follow --smart-case -g '!.git'",
-    fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+    rg_opts = "--color=never --files --hidden --follow --smart-case  -g '!.git'",
+    fd_opts = "--color=never --type f --hidden --follow  --no-ignore --exclude .git --exclude target",
     actions = {
       ["default"] = actions.file_edit,
     },
@@ -336,6 +336,7 @@ require("fzf-lua").setup({
   }, --}}}
 
   buffers = { --{{{
+    previewer = "builtin",
     prompt = "Buffers❯ ",
     file_icons = true,
     color_icons = true,
@@ -394,7 +395,6 @@ require("fzf-lua").setup({
     fzf_opts = {
       -- hide filename, tiebreak by line no.
       ["--delimiter"] = "'[\\]:]'",
-      ["--with-nth"] = "4..",
       ["--tiebreak"] = "index",
       ["--no-multi"] = false,
     },

@@ -13,10 +13,6 @@ local fzfbuiltin = require("fzf-lua.previewer.builtin")
 
 local M = {}
 
-local function nvim_command(cmd, args)
-  vim.api.nvim_command(cmd .. table.concat(args, " "))
-end
-
 ---Launches a ripgrep search with a fzf search interface.
 ---@param term? string if empty, the search will only happen on the content.
 ---@param no_ignore? boolean disables the ignore rules.
@@ -353,7 +349,7 @@ function M.open_config() --{{{
   preview["sink"] = function(filename)
     filename = filename:match("^[^\t]*")
     if filename ~= "" then
-      vim.api.nvim_command("edit " .. filename)
+      vim.cmd.edit(filename)
     end
   end
   vim.fn["fzf#run"](preview)
@@ -425,7 +421,7 @@ function M.delete_marks_native() --{{{
   preview["sink*"] = function(names)
     _t(names):slice(2):map(function(name)
       local mark = string.match(name, "^[^\t]+\t(%a)")
-      vim.api.nvim_command("delmarks " .. mark)
+      vim.cmd.delmarks(mark)
     end)
   end
   vim.fn["fzf#run"](preview)
@@ -472,7 +468,7 @@ function M.delete_marks() --{{{
   fzfcore.fzf_wrap(opts, entries, function(selected)
     for _, name in ipairs(selected) do
       local mark = string.match(name, "^(%a)")
-      vim.api.nvim_command("delmarks " .. mark)
+      vim.cmd.delmarks(mark)
     end
   end)()
 end -- }}}
@@ -525,7 +521,7 @@ function M.git_grep(term) --{{{
         local toplevel = vim.fn.system("git rev-parse --show-toplevel")
         toplevel = string.gsub(toplevel, "\n", "")
         local str = string.format([[fugitive://%s/.git//%s]], toplevel, sha)
-        vim.api.nvim_command("edit " .. str)
+        vim.cmd.edit(str)
       end
     end
   end
@@ -573,7 +569,7 @@ function M.git_tree() --{{{
       local toplevel = vim.fn.system("git rev-parse --show-toplevel")
       toplevel = string.gsub(toplevel, "\n", "")
       local str = string.format([[fugitive://%s/.git//%s]], toplevel, sha)
-      vim.api.nvim_command("edit " .. str)
+      vim.cmd.edit(str)
     end
   end
   vim.fn["fzf#run"](wrapped)
@@ -661,7 +657,7 @@ function M.add_args_native() --{{{
     options = "--multi --bind ctrl-a:select-all+accept",
   })
   wrapped["sink*"] = function(lines)
-    nvim_command("arga", lines)
+    vim.cmd.argadd(table.concat(lines, " "))
   end
   vim.fn["fzf#run"](wrapped)
 end --}}}
@@ -676,7 +672,7 @@ function M.add_args() --{{{
     fd_opts = "--color=never --type f --hidden --follow --exclude .git",
     actions = {
       ["default"] = function(selected)
-        nvim_command("arga", selected)
+        vim.cmd.argadd(table.concat(selected, " "))
       end,
     },
   })
@@ -691,7 +687,7 @@ function M.delete_args() --{{{
     },
     actions = {
       ["default"] = function(selected)
-        nvim_command("argd", selected)
+        vim.cmd.argdelete(table.concat(selected, " "))
       end,
     },
   })
@@ -704,7 +700,7 @@ function M.delete_args_native() --{{{
     options = "--multi --bind ctrl-a:select-all+accept",
   })
   wrapped["sink*"] = function(lines)
-    nvim_command("argd", lines)
+    vim.cmd.argdelete(table.concat(lines, " "))
   end
   vim.fn["fzf#run"](wrapped)
 end --}}}
@@ -724,6 +720,7 @@ function M.insert_into_list(items, is_local) --{{{
     end
     local bufnr = vim.fn.bufnr(item.filename)
     if bufnr > 0 then
+      item.bufnr = bufnr
       local line = vim.api.nvim_buf_get_lines(bufnr, item.lnum - 1, item.lnum, false)[1]
       if line ~= "" then
         item.text = line
@@ -738,15 +735,14 @@ end --}}}
 --the BTags functionality. Use it as an action.
 ---@param lines string[]
 function M.goto_def(lines) --{{{
-  local file = lines[1]
-  vim.api.nvim_command(("e %s"):format(file))
+  vim.cmd.edit(lines[1])
   if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
     local ok = pcall(vim.lsp.buf.document_symbol)
     if ok then
       return
     end
   end
-  vim.api.nvim_command("BTags")
+  vim.cmd.BTags()
 end --}}}
 
 function M.autocmds_native() --{{{
@@ -943,8 +939,7 @@ end --}}}
 ---Shows a fzf search for going to a line number.
 ---@param lines string[]
 local function goto_line(lines) --{{{
-  local file = lines[1]
-  vim.api.nvim_command(("e %s"):format(file))
+  vim.cmd.e(lines[1])
   quick.normal("n", ":")
 end --}}}
 
@@ -959,14 +954,14 @@ end --}}}
 ---@param items string[]|table[]
 local function set_qf_list(items) --{{{
   M.insert_into_list(items, false)
-  vim.api.nvim_command("copen")
+  vim.cmd.copen()
 end --}}}
 
 ---Set selected lines in the local list with fzf search.
 ---@param items string[]|table[]
 local function set_loclist(items) --{{{
   M.insert_into_list(items, true)
-  vim.api.nvim_command("lopen")
+  vim.cmd.lopen()
 end --}}}
 
 M.fzf_actions = { --{{{

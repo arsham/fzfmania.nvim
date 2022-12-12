@@ -55,8 +55,7 @@ local function insert_locallist() --{{{
 end --}}}
 
 local function sink_line_number(lines) --{{{
-  local file = lines[1]
-  vim.api.nvim_command(("e %s"):format(file))
+  vim.cmd.edit(lines[1])
   quick.normal("n", ":")
 end --}}}
 
@@ -145,20 +144,18 @@ require("fzf-lua").setup({
       ["alt-q"] = insert_qflist(),
       ["alt-w"] = insert_locallist(),
       ["alt-@"] = function(lines)
-        local file = lines[1]
-        vim.api.nvim_command(("e %s"):format(file))
+        vim.cmd.edit(lines[1])
         if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
           fzf.lsp_document_symbols({ jump_to_single_result = true })
           actions.ensure_insert_mode()
           return
         end
-        vim.api.nvim_command("BTags")
+        vim.cmd.BTags()
         actions.ensure_insert_mode()
       end,
       ["alt-:"] = sink_line_number,
       ["alt-/"] = function(lines)
-        local file = lines[1]
-        vim.api.nvim_command(("e %s"):format(file))
+        vim.cmd.edit(lines[1])
         fzf.blines()
         actions.ensure_insert_mode()
       end,

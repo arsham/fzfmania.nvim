@@ -120,8 +120,8 @@ local function config(opts)
         options = { "--no-multi" },
       })
       wrapped["sink*"] = function(dir)
-        vim.api.nvim_command("tabnew")
-        vim.api.nvim_command("tcd " .. dir[2])
+        vim.cmd.tabnew()
+        vim.cmd.tcd(dir[2])
       end
       vim.fn["fzf#run"](wrapped)
     end, o)

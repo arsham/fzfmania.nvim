@@ -4,56 +4,6 @@ local quick = require("arshlib.quick")
 local fzf = require("fzf-lua")
 local lsp = require("arshlib.lsp")
 
-local function prepare_list_items(items) --{{{
-  local _items = {}
-  for _, item in ipairs(items) do
-    if not string.find(item, ":") then
-      table.insert(_items, item)
-    elseif string.find(item, "") then
-      local name, line, content = item:match(" ([^:]+):([^:]+):(.+)")
-      table.insert(_items, {
-        filename = vim.fn.fnameescape(name),
-        lnum = tonumber(line),
-        col = 1,
-        text = content,
-      })
-    else
-      local name, line, col, content
-      local _, count = string.gsub(item, ":", 0)
-      -- TODO: use matching to .+:%d:%d:.+
-      if count == 3 then
-        name, line, col, content = item:match("^([^:]+):([^:]+):([^:]+):(.*)")
-      else
-        name, line, content = item:match("^([^:]+):([^:]+):(.*)")
-      end
-      if content == nil then
-        content, col = col, content
-      end
-      table.insert(_items, {
-        filename = vim.fn.fnameescape(name),
-        lnum = tonumber(line),
-        col = col or 1,
-        text = content,
-      })
-    end
-  end
-  return _items
-end --}}}
-
-local function insert_qflist() --{{{
-  return function(items)
-    util.insert_into_list(prepare_list_items(items), false)
-    vim.api.nvim_command("copen")
-  end
-end --}}}
-
-local function insert_locallist() --{{{
-  return function(items)
-    util.insert_into_list(prepare_list_items(items), true)
-    vim.api.nvim_command("lopen")
-  end
-end --}}}
-
 local function sink_line_number(lines) --{{{
   vim.cmd.edit(lines[1])
   quick.normal("n", ":")
@@ -115,7 +65,8 @@ require("fzf-lua").setup({
       ["<F1>"] = "toggle-help",
       ["<F2>"] = "toggle-fullscreen",
       ["<F3>"] = "toggle-preview-wrap",
-      ["<C-_>"] = "toggle-preview",
+      ["<C-/>"] = "toggle-preview",
+      [""] = "toggle-preview",
       ["<F5>"] = "toggle-preview-ccw",
       ["<F6>"] = "toggle-preview-cw",
       ["<M-j>"] = "preview-page-down",
@@ -141,8 +92,8 @@ require("fzf-lua").setup({
       ["ctrl-s"] = actions.file_split,
       ["ctrl-v"] = actions.file_vsplit,
       ["ctrl-t"] = actions.file_tabedit,
-      ["alt-q"] = insert_qflist(),
-      ["alt-w"] = insert_locallist(),
+      ["alt-q"] = actions.file_sel_to_qf,
+      ["alt-w"] = actions.file_sel_to_ll,
       ["alt-@"] = function(lines)
         vim.cmd.edit(lines[1])
         if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
@@ -166,8 +117,8 @@ require("fzf-lua").setup({
       ["ctrl-s"] = actions.buf_split,
       ["ctrl-v"] = actions.buf_vsplit,
       ["ctrl-t"] = actions.buf_tabedit,
-      ["alt-q"] = insert_qflist(),
-      ["alt-w"] = insert_locallist(),
+      ["alt-q"] = actions.buf_sel_to_qf,
+      ["alt-w"] = actions.buf_sel_to_ll,
       ["alt-:"] = sink_line_number,
     }, --}}}
   }, --}}}

@@ -1,5 +1,5 @@
 local M = {}
-local health = vim.health or require("health")
+local health = vim.health
 
 local libs = {
   arshlib = "arsham/arshlib.nvim",
@@ -9,11 +9,12 @@ local libs = {
 }
 
 local executables = {
-  git = { "git", "yay -S git" },
-  Ripgrep = { "rg", "yay -S rg" },
-  FZF = { "fzf", "yay -S fzf" },
-  fd = { "fd", "yay -S fd" },
-  bat = { "bat", "yay -S bat" },
+  git = { "git", "paru -S git" },
+  Ripgrep = { "rg", "paru -S rg" },
+  fzf = { "fzf", "paru -S fzf" },
+  fd = { "fd", "paru -S fd" },
+  bat = { "bat", "paru -S bat" },
+  viu = { "viu", "paru -S viu" },
 }
 
 M.check = function()

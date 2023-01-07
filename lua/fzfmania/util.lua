@@ -436,7 +436,7 @@ function M.delete_marks() --{{{
       ["--bind"] = "ctrl-a:select-all+accept",
     },
   }
-  opts = fzfconfig.normalize_opts(opts, fzfconfig.globals.nvim.marks)
+  opts = fzfconfig.normalize_opts(opts, fzfconfig.globals.marks)
   if not opts then
     return
   end

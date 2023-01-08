@@ -14,6 +14,8 @@ options you want.
 
 1. [Requirements](#requirements)
 2. [Installation](#installation)
+   - [Lazy](#lazy)
+   - [Packer](#packer)
    - [Important Note](#important-note)
    - [Configuration](#configuration)
 3. [Mappings](#mappings)
@@ -24,7 +26,7 @@ options you want.
 ## Requirements
 
 This library supports [Neovim
-0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0) or newer.
+v0.7.0](https://github.com/neovim/neovim/releases/tag/v0.7.0) or newer.
 
 This library depends are the following libraries. Please make sure to add them
 as dependencies in your package manager:
@@ -42,7 +44,32 @@ as dependencies in your package manager:
 
 ## Installation
 
-Use your favourite package manager to install this library. Packer example:
+Use your favourite package manager to install this library.
+
+### Lazy
+
+```lua
+{
+  "arsham/fzfmania.nvim",
+  dependencies = {
+    "arshlib.nvim",
+    "fzf.vim",
+    "nvim.lua",
+    "plenary.nvim",
+    -- uncomment if you want a better ui.
+    -- {
+    --   "ibhagwan/fzf-lua",
+    --   dependencies = { "kyazdani42/nvim-web-devicons" },
+    -- },
+  },
+  config = {
+    -- frontend = "fzf-lua", -- uncomment if you want a better ui.
+  },
+  event = { "VeryLazy" },
+}
+```
+
+### Packer
 
 ```lua
 use({
@@ -86,7 +113,7 @@ require("fzfmania").config({
     git_files = false,
     in_files = false,
   },
-  commands = false,                    -- completely disables creating commands
+  commands = false, -- completely disables creating commands
 })
 ```
 
@@ -96,8 +123,8 @@ files search and listing files mappings are set:
 ```lua
 require("fzfmania").config_empty({
   mappings = {
-    in_files = "<leader>F",            -- use this mapping for me
-    files = true,                      -- use the default mappings
+    in_files = "<leader>F", -- use this mapping for me
+    files = true, -- use the default mappings
   },
 })
 ```

@@ -1,4 +1,4 @@
-table.insert(vim.opt.rtp, vim.env.HOME .. "/.fzf")
+vim.opt.rtp:append(vim.env.HOME .. "/.fzf")
 
 vim.g.fzf_commands_expect = "enter"
 vim.g.fzf_layout = {

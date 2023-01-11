@@ -180,7 +180,7 @@ require("fzf-lua").setup({
     color_icons = true,
     find_opts = [[-type f -not -path '*/\.git/*' -printf '%P\n']],
     rg_opts = "--color=never --files --hidden --follow --smart-case  -g '!.git'",
-    fd_opts = "--color=never --type f --hidden --follow  --no-ignore --exclude .git --exclude target",
+    fd_opts = "--color=never --type f --hidden --follow  --no-ignore --exclude .git --exclude target --exclude .cache --exclude node_modules",
     actions = {
       ["default"] = actions.file_edit,
     },

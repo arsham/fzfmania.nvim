@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "Lua.diagnostics.disable": ["missing-parameter"],
+  "Lua.diagnostics.globals": ["vim", "_t", "require"],
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.workspace.library": [
+    "runtime/lua",
+    "/usr/share/nvim/runtime",
+    "/home/arsham/.cache/nvim/lazy/arshlib.nvim",
+    "/home/arsham/.cache/nvim/lazy/fzf-lua",
+    "${3rd}/luassert/library"
+  ]
+}

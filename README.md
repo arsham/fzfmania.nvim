@@ -197,7 +197,6 @@ Here is a list of default configurations:
     git_grep     = "GGrep",
     git_tree     = "GTree",
     buffer_lines = "BLines",
-    reload       = "Reload",
     config       = "Config",
     todo         = "Todo",
     marks_delete = "MarksDelete",
@@ -279,7 +278,6 @@ cancel, which will land you to the file, and you can invoke `<leader>@` for
 | `ArgsAdd`     | Select and add files to the args list      |
 | `ArgsDelete`  | Select and delete files from the args list |
 | `Worktree`    | Switch between git worktrees               |
-| `Reload`      | Reload one or more lua config files        |
 | `BLines`      | Search in current buffer                   |
 | `History`     | Show open file history                     |
 | `Checkout`    | Checkout a branch                          |
@@ -299,7 +297,6 @@ These functions can be imported from the `fzfmania.util` module.
 | `ripgrep_search_incremental` | Incremental Ripgrep search with fzf                                |
 | `delete_buffer`              | Shows all opened buffers and let you delete them                   |
 | `lines_grep`                 | Incremental searches in the lines of current buffer                |
-| `reload_config`              | Reloads config files                                               |
 | `open_config`                | Open one of your Neovim config files                               |
 | `marks`                      | Show marks with preview                                            |
 | `delete_marks`               | Show marks for deletion                                            |
@@ -316,5 +313,5 @@ These functions can be imported from the `fzfmania.util` module.
 Licensed under the MIT License. Check the [LICENSE](./LICENSE) file for details.
 
 <!--
-vim: foldlevel=1
+vim: foldlevel=1 conceallevel=0
 -->

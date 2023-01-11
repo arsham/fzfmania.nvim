@@ -30,7 +30,8 @@ local function config(opts)
   end --}}}
 
   if opts.reload then --{{{
-    local o = { desc = "Reload configuration" }
+    local o = { desc = "Reload configuration (deprecated)" }
+    ---@diagnostic disable-next-line: deprecated
     command(opts.reload, util.reload_config, o)
   end --}}}
 

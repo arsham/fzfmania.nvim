@@ -270,6 +270,7 @@ function M.lines_grep(actions, header) --{{{
 end --}}}
 
 ---Launches a fzf search for reloading config files.
+---@deprecated will be removed!
 function M.reload_config() --{{{
   local loc = vim.env["MYVIMRC"]
   local base_dir = require("plenary.path"):new(loc):parents()[1]

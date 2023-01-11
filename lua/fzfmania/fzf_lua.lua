@@ -10,7 +10,7 @@ end --}}}
 
 require("fzf-lua").setup({
   winopts = { --{{{
-    height = 0.5,
+    height = 0.7,
     width = 1,
     row = 1,
     border = false,
@@ -27,9 +27,10 @@ require("fzf-lua").setup({
 
     preview = { --{{{
       -- default = "bat",
+      border = "noborder",
       wrap = "nowrap",
       hidden = "nohidden",
-      vertical = "down:45%",
+      vertical = "up:45%",
       horizontal = "right:70%",
       layout = "flex",
       flip_columns = 120,
@@ -37,7 +38,6 @@ require("fzf-lua").setup({
       scrollbar = "float",
       scrolloff = "-2",
       scrollchars = { "█", "" },
-      delay = 30,
 
       winopts = { -- Builtin previewer window options {{{
         number = true,
@@ -125,7 +125,7 @@ require("fzf-lua").setup({
   fzf_opts = { --{{{
     ["--ansi"] = "",
     ["--prompt"] = "> ",
-    ["--info"] = "inline",
+    ["--info"] = "default",
     ["--height"] = "100%",
     ["--layout"] = "default",
     ["--no-multi"] = false,
@@ -139,7 +139,7 @@ require("fzf-lua").setup({
     bat = { --{{{
       cmd = "bat",
       args = "--style=numbers,changes --color always",
-      theme = "Coldark-Dark",
+      theme = "Monokai Extended Light",
       config = nil,
     }, --}}}
     head = { --{{{
@@ -219,8 +219,14 @@ require("fzf-lua").setup({
       preview = "git show --pretty='%Cred%H%n%Cblue%an%n%Cgreen%s' --color {1}",
       actions = {
         ["default"] = actions.git_buf_edit,
-        ["ctrl-s"] = actions.git_buf_split,
-        ["ctrl-v"] = actions.git_buf_vsplit,
+        ["ctrl-s"] = function(...)
+          actions.git_buf_split(...)
+          vim.cmd.windo("diffthis")
+        end,
+        ["ctrl-v"] = function(...)
+          actions.git_buf_vsplit(...)
+          vim.cmd.windo("diffthis")
+        end,
         ["ctrl-t"] = actions.git_buf_tabedit,
       },
     }, --}}}

@@ -1,0 +1,510 @@
+*fzfmania.txt*                                       Powerful FZF setup in Lua
+
+                 Powerful FZF setup in Lua for Neovim.
+
+              _____     __ __  __             _        ~
+             |  ___|___/ _|  \/  | __ _ _ __ (_) __ _  ~
+             | |_ |_  / |_| |\/| |/ _` | '_ \| |/ _` | ~
+             |  _| / /|  _| |  | | (_| | | | | | (_| | ~
+             |_|  /___|_| |_|  |_|\__,_|_| |_|_|\__,_| ~
+
+
+
+Author:   Arsham Shirvani <arsham@duck.com>
+Homepage: <https://github.com/arsham/fzfmania.nvim>
+License:  MIT license
+
+==============================================================================
+CONTENTS                                                   *fzfmania-contents*
+
+1. Introduction ...................................... |fzfmania-introduction|
+2. Requirements ...................................... |fzfmania-requirements|
+3. Installation ...................................... |fzfmania-installation|
+   - Lazy ....................................... |fzfmania-installation-lazy|
+   - Packer ................................... |fzfmania-installation-packer|
+   - Important Note ................................ |fzfmania-important_note|
+   - Configuration .................................. |fzfmania-configuration|
+4. Mappings .............................................. |fzfmania-mappings|
+5. Commands .............................................. |fzfmania-commands|
+6. Functions ............................................ |fzfmania-functions|
+7. License ................................................ |fzfmania-license|
+
+==============================================================================
+INTRODUCTION                                           *fzfmania-introduction*
+
+Powerful FZF setup in Lua for Neovim.
+
+Neovim and FZF are awesome projects, and when they work together they can save
+you time by doing complex tasks very quickly.
+
+This setup can be used as a whole, or parts can be disabled selectively or you
+can setup up an empty config with the 'config_empty' function and enable the
+options you want.
+
+==============================================================================
+REQUIREMENTS                                           *fzfmania-requirements*
+
+This library supports Neovim v0.7.0 or newer.
+
+This library depends are the following libraries. Please make sure to add them
+as dependencies in your package manager:
+
+ Project         Link                                      Reason for using
+------------------------------------------------------------------------------
+ arshlib.nvim  <https://github.com/arsham/arshlib.nvim>   common library
+ listish.nvim  <https://github.com/arsham/listish.nvim>   for sinking to lists
+ plenary.nvim  >https://github.com/nvim-lua/plenary.nvim
+ fzf.vim       >https://github.com/junegunn/fzf.vim
+ fzf-lua       <https://github.com/ibhagwan/fzf-lua>      (Optional) better ui
+ fd            <https://github.com/sharkdp/fd>            fast file find
+ Ripgrep       >https://github.com/BurntSushi/ripgrep
+ bat           <https://github.com/sharkdp/bat>           coloured previews
+
+==============================================================================
+INSTALLATION                                           *fzfmania-installation*
+
+Use your favourite package manager to install this library.
+
+LAZY                                              *fzfmania-installation-lazy*
+------------------------------------------------------------------------------
+
+>lua
+  {
+    "arsham/fzfmania.nvim",
+    dependencies = {
+      "arshlib.nvim",
+      "fzf.vim",
+      "nvim.lua",
+      "plenary.nvim",
+      -- uncomment if you want a better ui.
+      -- {
+      --   "ibhagwan/fzf-lua",
+      --   dependencies = { "kyazdani42/nvim-web-devicons" },
+      -- },
+    },
+    config = {
+      -- frontend = "fzf-lua", -- uncomment if you want a better ui.
+    },
+    event = { "VeryLazy" },
+  }
+<
+
+PACKER                                          *fzfmania-installation-packer*
+------------------------------------------------------------------------------
+
+>lua
+  use({
+    "arsham/fzfmania.nvim",
+    requires = {
+      "arshlib.nvim",
+      "fzf.vim",
+      "nvim.lua",
+      "plenary.nvim",
+      -- uncomment if you want a better ui.
+      -- {
+      --   "ibhagwan/fzf-lua",
+      --   requires = { "kyazdani42/nvim-web-devicons" },
+      -- },
+    },
+    after = { "listish.nvim", "fzf-lua" },
+    config = function() require("fzfmania").config({
+      -- frontend = "fzf-lua", -- uncomment if you want a better ui.
+    }),
+    event = { "UIEnter" }, -- best way to lazy load this plugin
+  })
+<
+
+IMPORTANT NOTE                                       *fzfmania-important_note*
+------------------------------------------------------------------------------
+
+If you are using this plugin, you can't lazy load |listish.nvim| any more.
+Therefore your listing setup should not contain any 'after', 'keys', 'cmd',
+'ft', or anything that marks it as an 'opt' package.
+
+CONFIGURATION                                          *fzfmania-configuration*
+------------------------------------------------------------------------------
+
+If you don't pass anything to the 'config()' function, it enable everything
+with their default. You can change individual settings by providing
+replacements, or disable them by setting them to 'false'.
+>lua
+  require("fzfmania").config({
+    frontend = "fzf-lua", -- uses fzf-lua for handling the ui
+    mappings = {
+      git_files = false,
+      in_files = false,
+    },
+    commands = false, -- completely disables creating commands
+  })
+<
+
+You may also use this form to only enable a few items. In this setup only in
+files search and listing files mappings are set:
+>lua
+  require("fzfmania").config_empty({
+    mappings = {
+      in_files = "<leader>F", -- use this mapping for me
+      files = true, -- use the default mappings
+    },
+  })
+<
+
+Note that you also want to set the 'fzf_actions', they will become disabled if
+you use the 'config_empty' function.
+
+Some mappings can be in form of a string or a table. If you provide a string,
+it only creates the map for when you can't filter by filenames. If you
+provide a table with two values, the first one doesn't filter by filenames,
+and the second one will do. In these cases, I have chosen the capitalised
+second letter for enabling file names filtering. For example:
+>lua
+  in_files = {
+    "<leader>ff", -- doesn't filter filenames as you type
+    "<leader>fF", -- filters filenames too as you type.
+  },
+  -- or
+  in_files = "<leader>ff" -- only this version is available.
+<
+
+Here is a list of default configurations:
+
+>lua
+  {
+    fzf_history_dir = vim.env.HOME .. "/.local/share/fzf-history",
+    frontend = "fzf.vim",                -- set to "fzf-lua" for handling the ui
+    mappings = {
+      commands = "<leader>:",            -- Show commands
+      history  = "<leader>fh",           -- Show history
+      files    = "<C-p>",                -- Show files in cwd
+      files_location = {                 -- Show files in home or given location
+        loc = vim.env.HOME,              -- You can set to any location
+        key = "<M-p>",                    -- Alt+p
+      },
+      buffers            = "<C-b>",      -- Show buffers
+      delete_buffers     = "<M-b>",      -- Delete buffers
+      git_files          = "<leader>gf", -- Show files in git (git ls-files)
+      buffer_lines       = "<C-_>",      -- CTRL-/ grep lines of current buffer
+      all_buffer_lines   = "<M-/>",      -- Search in lines of all open buffers
+      complete_dict      = "<c-x><c-k>", -- (Inser mode) dict completion
+      complete_path      = "<c-x><c-f>", -- (Insert mode) path completion
+      complete_line      = "<c-x><c-l>", -- (Insert mode) line completion
+      spell_suggestion   = "z=",         -- Show spell suggestions
+      in_files           = {             -- if it's a string, only the first
+                                         -- mapping is made
+        "<leader>ff",                    -- find in files
+        "<leader>fF",                    -- find in files with filtering
+                                         -- filenames
+      },
+      in_files_force     = {
+        "<leader>fa",                    -- find in files (ignore .gitignore)
+        "<leader>fA",                    -- find in files (ignore .gitignore)
+                                         -- with filtering filenames
+      },
+      incremental_search = "<leader>fi", -- Incremental search with rg
+      current_word       = {
+        "<leader>rg",                    -- search for current word
+        "<leader>rG",                    -- search for current word with
+                                         -- filtering filenames
+      },
+      current_word_force = {
+        "<leader>ra",                    -- search for current word
+                                         -- (ignore .gitignore)
+        "<leader>rA",                    -- search for current word
+                                         -- (ignore .gitignore) with filtering
+                                         -- filenames
+      },
+      marks              = "<leader>mm", -- Show marks
+      tags               = "<leader>@",  -- Show tags
+      fzf_builtin        = "<leader>t"   -- Invokes fzf-lua builtin popup
+    },
+    commands = {
+      git_grep     = "GGrep",
+      git_tree     = "GTree",
+      buffer_lines = "BLines",
+      config       = "Config",
+      todo         = "Todo",
+      marks_delete = "MarksDelete",
+      marks        = "Marks",
+      args_add     = "ArgsAdd",
+      args_delete  = "ArgsDelete",
+      history      = "History",
+      checkout     = "Checkout",
+      work_tree    = "WorkTree",         -- git work-tree
+      git_status   = "GitStatus",        -- only with fzf-lua frontend
+      jumps        = "Jumps",            -- Choose from the jump list
+      autocmds     = "Autocmds",         -- List autocmds
+      changes      = "Changes",          -- Choose from change list
+      registers    = "Registers",        -- View registers
+    },
+  }
+<
+
+------------------------------------------------------------------------------
+MAPPINGS                                                   *fzfmania-mappings*
+
+Most actions can apply to multiple selected items if possible.
+
+                                                             *fzfmania-ctrl-p*
+<Ctrl-p>
+                  File list in current folder.
+
+                                                              *fzfmania-alt-p*
+<Alt-p>
+                   File list in home folder.
+
+                                                             *fzfmania-ctrl-b*
+<Ctrl-b>
+                   Buffer list.
+
+                                                              *fzfmania-alt-b*
+<Alt-b>
+                   Delete buffers from the buffer list.
+
+                                                             *fzfmania-ctrl-/*
+<Ctrl-/>
+                   Search in lines on current buffer.
+
+                                                              *fzfmania-alt-/*
+<Alt-/>
+                   Search in lines of all open buffers.
+
+                                                           *fzfmania-leader-@*
+<leader>@
+                   Search in ctags or LSP symbols (see below).
+
+                   Note that if a 'LSP' server is not attached to the buffer,
+                   it will fall back to 'ctags'.
+
+                   Sometimes when you list files and 'sink' with @, the 'LSP'
+                   might not be ready yet, therefore it falls back to 'ctags'
+                   immediately. In this case you can cancel, which will land
+                   you to the file, and you can invoke '<leader>@' for LSP
+                   symbols.
+
+                                                           *fzfmania-leader-:*
+<leader>:
+                   Commands
+
+                                                          *fzfmania-leader-ff*
+<leader>ff
+                   Find in contents of all files in current folder.
+
+                                                          *fzfmania-leader-fa*
+<leader>fa
+                   Find All disabling '.gitignore' handling.
+
+                                                          *fzfmania-leader-fi*
+<leader>fi
+                   Incrementally Find.
+
+                                                          *fzfmania-leader-rg*
+<leader>rg
+                   Search (rg) with current word.
+
+                                                          *fzfmania-leader-ra*
+<leader>ra
+                   Search (rg) disabling '.gitignore' handling.
+
+                                                          *fzfmania-leader-ri*
+<leader>ri
+                   Incrementally search (rg) with current word.
+
+                                                          *fzfmania-leader-fh*
+<leader>fh
+                   File History
+
+                                                          *fzfmania-leader-fl*
+<leader>fl
+                   File locate (requires mlocate)
+
+                                                          *fzfmania-leader-gf*
+<leader>gf
+                   GFiles
+
+                                                          *fzfmania-leader-mm*
+<leader>mm
+                   Marks
+
+                                                      *fzfmania-ctrl_x-ctrl_k*
+<Ctrl-x><Ctrl-k>
+                   Search in dictionaries (requires words-insane)
+
+                                                      *fzfmania-ctrl_x-ctrl_f*
+<Ctrl-x><Ctrl-f>
+                   Search in files
+
+                                                      *fzfmania-ctrl_x-ctrl_l*
+<Ctrl-x><Ctrl-l>
+                   Search in lines
+
+                                                           *fzfmania-leader-t*
+<leader>t
+                   Invoke fzf-lua builtin popup
+
+
+If you keep hitting '<Ctrl-/>' the preview window will change width. With
+'Shift-/' you can show and hide the preview window.
+
+When a file is selected, additional to what fzf provides out of the box, you
+can invoke one of these secondary actions:
+
+                                                       *fzfmania-action-alt-/*
+alt-/
+                   To search in the lines.
+
+                                                       *fzfmania-action-alt-@*
+alt-@
+                   To search in ctags or lsp symbols.
+
+                                                       *fzfmania-action-alt-:*
+alt-:
+                   To go to a specific line.
+
+                                                       *fzfmania-action-alt-q*
+alt-q
+                   Add items to the quickfix list.
+
+                                                       *fzfmania-action-alt-w*
+alt-w
+                   Add items to the local list.
+
+
+==============================================================================
+COMMANDS                                                   *fzfmania-commands*
+
+                                                                      *:GGrep*
+:GGrep
+                   Run git grep
+
+                                                                      *:GTree*
+:GTree
+                   Browse git commits
+
+                                                                      *:Marks*
+:Marks
+                   Show marks with preview
+
+                                                                *:MarksDelete*
+:MarksDelete
+                   Delete marks
+
+                                                                       *:Todo*
+:Todo
+                   List todo/fixme lines
+
+                                                                    *:ArgsAdd*
+:ArgsAdd
+                   Select and add files to the args list
+
+                                                                 *:ArgsDelete*
+:ArgsDelete
+                   Select and delete files from the args list
+
+                                                                   *:Worktree*
+:Worktree
+                   Switch between git worktrees
+
+                                                                     *:BLines*
+:BLines
+                   Search in current buffer
+
+                                                                    *:History*
+:History
+                   Show open file history
+
+                                                                   *:Checkout*
+:Checkout
+                   Checkout a branch
+
+                                                                  *:GitStatus*
+:GitStatus
+                   Show git status
+
+                                                                      *:Jumps*
+:Jumps
+                   Choose from jump list
+
+                                                                   *:Autocmds*
+:Autocmds
+                   Show autocmds
+
+                                                                    *:Changes*
+:Changes
+                   Show change list
+
+                                                                  *:Registers*
+:Registers
+                   Show register contents
+
+
+==============================================================================
+FUNCTIONS                                                 *fzfmania-functions*
+
+These functions can be imported from the 'fzfmania.util' module.
+
+                                            *fzfmania-function-ripgrep_search*
+ripgrep_search()
+                   Ripgrep search
+
+                                *fzfmania-function-ripgrep_search_incremental*
+ripgrep_search_incremental()
+                   Incremental Ripgrep search with fzf
+
+                                             *fzfmania-function-delete_buffer*
+delete_buffer()
+                   Shows all opened buffers and let you delete them
+
+                                                *fzfmania-function-lines_grep*
+lines_grep()
+                   Incremental searches in the lines of current buffer
+
+                                               *fzfmania-function-open_config*
+open_config()
+                   Open one of your Neovim config files
+
+                                                     *fzfmania-function-marks*
+marks()
+                   Show marks with preview
+
+                                              *fzfmania-function-delete_marks*
+delete_marks()
+                   Show marks for deletion
+
+                                                  *fzfmania-function-git_grep*
+git_grep()
+                   Two phase search in all git commits
+
+                                           *fzfmania-function-checkout_branch*
+checkout_branch()
+                   Checkout a branch
+
+                                                 *fzfmania-function-open_todo*
+open_todo()
+                   Search for all todo/fixme/etc.
+
+                                                  *fzfmania-function-add_args*
+add_args()
+                   Find and add files to the args list
+
+                                               *fzfmania-function-delete_args*
+delete_args()
+                   Choose and remove files from the args list
+
+                                          *fzfmania-function-insert_into_list*
+insert_into_list()
+                   ('Action') Populate quickfix/local lists with search results
+
+                                                  *fzfmania-function-goto_def*
+goto_def()
+                   ('Action') Go to definition. In absence of LSP falls back
+                   to BTags
+
+
+==============================================================================
+LICENSE                                                     *fzfmania-license*
+
+Licensed under the MIT License. Check the LICENSE (./LICENSE) file for details.
+
+*listish* <https://github.com/arsham/listish.nvim>
+
+vim:tw=78:ft=help

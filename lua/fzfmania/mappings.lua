@@ -35,6 +35,11 @@ local function _config(opts)
     local o = op("Show files")
     if opts.frontend then
       vim.keymap.set("n", opts.files, fzf.files, o)
+      vim.keymap.set("n", "<C-S>p", function()
+        fzf.files({
+          rg_opts = "--color=never --files --hidden --follow --smart-case  --no-ignore -g '!.git'",
+        })
+      end, o)
     else
       vim.keymap.set("n", opts.files, ":Files<CR>", o)
     end

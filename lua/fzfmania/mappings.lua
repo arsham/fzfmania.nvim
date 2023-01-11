@@ -8,6 +8,10 @@ local function op(desc)
 end
 
 local function _config(opts)
+  local frontend = " (native)"
+  if opts.frontend then
+    frontend = " (fzf-lua)"
+  end
   if opts.commands then --{{{
     local o = op("Show commands")
     if opts.frontend then

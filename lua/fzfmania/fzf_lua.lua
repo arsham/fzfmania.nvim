@@ -1,5 +1,4 @@
 local actions = require("fzf-lua.actions")
-local util = require("fzfmania.util")
 local quick = require("arshlib.quick")
 local fzf = require("fzf-lua")
 local lsp = require("arshlib.lsp")

@@ -31,6 +31,7 @@ function M.ripgrep_search(term, no_ignore, filenames) --{{{
     end
     delimiter = "--delimiter :"
   end
+  ---@diagnostic disable-next-line: cast-local-type
   no_ignore = no_ignore and "" or "--no-ignore"
 
   local rg_cmd = table.concat({
@@ -63,8 +64,9 @@ end --}}}
 
 ---Launches an incremental search with ripgrep and fzf.
 ---@param term? string if empty, the search will only happen on the content.
----@param no_ignore? string disables the ignore rules.
+---@param no_ignore? boolean disables the ignore rules.
 function M.ripgrep_search_incremental(term, no_ignore) --{{{
+  ---@diagnostic disable-next-line: param-type-mismatch
   term = vim.fn.shellescape(term)
   local query = ""
   local nth = ""
@@ -76,7 +78,6 @@ function M.ripgrep_search_incremental(term, no_ignore) --{{{
     nth = "--nth 1,4.."
     delimiter = "--delimiter :"
   end
-  no_ignore = no_ignore and "" or "--no-ignore"
 
   local rg_cmd = table.concat({
     "rg",
@@ -87,7 +88,7 @@ function M.ripgrep_search_incremental(term, no_ignore) --{{{
     "--smart-case",
     "--hidden",
     '-g "!.git/" ',
-    no_ignore,
+    no_ignore and "" or "--no-ignore",
     "-- %s || true",
   }, " ")
 
@@ -430,14 +431,14 @@ end --}}}
 
 ---Show marks for deletion.
 function M.delete_marks() --{{{
-  local opts = {
+  local spec = {
     fzf_opts = {
       ["--multi"] = "",
       ["--exit-0"] = "",
       ["--bind"] = "ctrl-a:select-all+accept",
     },
   }
-  opts = fzfconfig.normalize_opts(opts, fzfconfig.globals.marks)
+  local opts = fzfconfig.normalize_opts(spec, fzfconfig.globals.marks)
   if not opts then
     return
   end
@@ -606,11 +607,11 @@ end --}}}
 ---Search for all todo/fixme/etc.
 ---@param extra_terms table any extra terms.
 function M.open_todo(extra_terms) --{{{
-  local terms = vim.tbl_extend("force", {
+  local spec = vim.tbl_extend("force", {
     "fixme",
     "todo",
   }, extra_terms)
-  terms = table.concat(terms, "|")
+  local terms = table.concat(spec, "|")
 
   local cmd = table.concat({
     "rg",
@@ -909,8 +910,8 @@ function M.jumps(opts) --{{{
     return
   end
 
-  local jumps = vim.fn.execute(opts.cmd)
-  jumps = vim.split(jumps, "\n")
+  local jump_list = vim.fn.execute(opts.cmd)
+  local jumps = vim.split(jump_list, "\n")
 
   local entries = {}
   for i = #jumps - 1, 3, -1 do

@@ -53,8 +53,13 @@ require("fzf-lua").setup({
     }, --}}}
 
     on_create = function() --{{{
-      --   vim.api.nvim_buf_set_keymap(0, "t", "<C-j>", "<Down>",
-      --     { silent = true, noremap = true })
+      -- pasting from registers.
+      vim.keymap.set(
+        "t",
+        "<C-r>",
+        [['<C-\><C-N>"'.nr2char(getchar()).'pi']],
+        { buffer = 0, noremap = true, expr = true }
+      )
     end, --}}}
   }, --}}}
 

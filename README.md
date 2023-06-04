@@ -236,7 +236,6 @@ Most actions can apply to multiple selected items if possible.
 | `<leader>ra`       | Search (**rg**) disabling `.gitignore` handling.       |
 | `<leader>ri`       | **I**ncrementally search (**rg**) with current word.   |
 | `<leader>fh`       | **F**ile **H**istory                                   |
-| `<leader>fl`       | **F**ile **l**ocate (requires mlocate)                 |
 | `<leader>gf`       | **GFiles**                                             |
 | `<leader>mm`       | **Marks**                                              |
 | `<Ctrl-x><Ctrl-k>` | Search in **dictionaries** (requires **words-insane**) |

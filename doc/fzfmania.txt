@@ -277,7 +277,6 @@ Most actions can apply to multiple selected items if possible.
              Incrementally search (rg) with current word.
 
 *LEADER-fh*  File History                                 *fzfmania_LEADER-fh*
-*LEADER-fl*  File locate (requires mlocate)               *fzfmania_LEADER-fl*
 *LEADER-gf*  GFiles                                       *fzfmania_LEADER-gf*
 *LEADER-mm*  Marks                                        *fzfmania_LEADER-mm*
 *CTRL-x_CTRL-k*                                       *fzfmania_CTRL-x_CTRL-k*

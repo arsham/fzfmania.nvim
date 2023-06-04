@@ -1,15 +1,11 @@
 :ArgsAdd	fzfmania.txt	/*:ArgsAdd*
 :ArgsDelete	fzfmania.txt	/*:ArgsDelete*
 :Autocmds	fzfmania.txt	/*:Autocmds*
-:BLines	fzfmania.txt	/*:BLines*
 :Changes	fzfmania.txt	/*:Changes*
 :Checkout	fzfmania.txt	/*:Checkout*
 :GGrep	fzfmania.txt	/*:GGrep*
 :GTree	fzfmania.txt	/*:GTree*
 :GitStatus	fzfmania.txt	/*:GitStatus*
-:History	fzfmania.txt	/*:History*
-:Jumps	fzfmania.txt	/*:Jumps*
-:Marks	fzfmania.txt	/*:Marks*
 :MarksDelete	fzfmania.txt	/*:MarksDelete*
 :Registers	fzfmania.txt	/*:Registers*
 :Todo	fzfmania.txt	/*:Todo*
@@ -41,6 +37,10 @@ checkout_branch()	fzfmania.txt	/*checkout_branch()*
 delete_args()	fzfmania.txt	/*delete_args()*
 delete_buffer()	fzfmania.txt	/*delete_buffer()*
 delete_marks()	fzfmania.txt	/*delete_marks()*
+fzfmania-:BLines	fzfmania.txt	/*fzfmania-:BLines*
+fzfmania-:History	fzfmania.txt	/*fzfmania-:History*
+fzfmania-:Jumps	fzfmania.txt	/*fzfmania-:Jumps*
+fzfmania-:Marks	fzfmania.txt	/*fzfmania-:Marks*
 fzfmania-action_ALT-/	fzfmania.txt	/*fzfmania-action_ALT-\/*
 fzfmania-action_ALT-:	fzfmania.txt	/*fzfmania-action_ALT-:*
 fzfmania-action_ALT-@	fzfmania.txt	/*fzfmania-action_ALT-@*
@@ -98,7 +98,6 @@ git_grep()	fzfmania.txt	/*git_grep()*
 goto_def()	fzfmania.txt	/*goto_def()*
 insert_into_list()	fzfmania.txt	/*insert_into_list()*
 lines_grep()	fzfmania.txt	/*lines_grep()*
-listish	fzfmania.txt	/*listish*
 marks()	fzfmania.txt	/*marks()*
 open_config()	fzfmania.txt	/*open_config()*
 open_todo()	fzfmania.txt	/*open_todo()*

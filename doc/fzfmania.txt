@@ -2,13 +2,18 @@
 
                  Powerful FZF setup in Lua for Neovim.
 
-              _____     __ __  __             _        ~
-             |  ___|___/ _|  \/  | __ _ _ __ (_) __ _  ~
-             | |_ |_  / |_| |\/| |/ _` | '_ \| |/ _` | ~
-             |  _| / /|  _| |  | | (_| | | | | | (_| | ~
-             |_|  /___|_| |_|  |_|\__,_|_| |_|_|\__,_| ~
 
 
+     █████▒▒███████▒  █████▒███▄ ▄███▓ ▄▄▄       ███▄    █  ██▓ ▄▄▄         ~
+   ▓██   ▒ ▒ ▒ ▒ ▄▀░▓██   ▒▓██▒▀█▀ ██▒▒████▄     ██ ▀█   █ ▓██▒▒████▄       ~
+   ▒████ ░ ░ ▒ ▄▀▒░ ▒████ ░▓██    ▓██░▒██  ▀█▄  ▓██  ▀█ ██▒▒██▒▒██  ▀█▄     ~
+   ░▓█▒  ░   ▄▀▒   ░░▓█▒  ░▒██    ▒██ ░██▄▄▄▄██ ▓██▒  ▐▌██▒░██░░██▄▄▄▄██    ~
+   ░▒█░    ▒███████▒░▒█░   ▒██▒   ░██▒ ▓█   ▓██▒▒██░   ▓██░░██░ ▓█   ▓██▒   ~
+    ▒ ░    ░▒▒ ▓░▒░▒ ▒ ░   ░ ▒░   ░  ░ ▒▒   ▓▒█░░ ▒░   ▒ ▒ ░▓   ▒▒   ▓▒█░   ~
+    ░      ░░▒ ▒ ░ ▒ ░     ░  ░      ░  ▒   ▒▒ ░░ ░░   ░ ▒░ ▒ ░  ▒   ▒▒ ░   ~
+    ░ ░    ░ ░ ░ ░ ░ ░ ░   ░      ░     ░   ▒      ░   ░ ░  ▒ ░  ░   ▒      ~
+             ░ ░                  ░         ░  ░         ░  ░        ░  ░   ~
+           ░                                                                ~
 
 Author:   Arsham Shirvani <arsham@duck.com>
 Homepage: <https://github.com/arsham/fzfmania.nvim>
@@ -117,16 +122,17 @@ PACKER                                          *fzfmania-installation-packer*
 IMPORTANT NOTE                                       *fzfmania-important_note*
 ------------------------------------------------------------------------------
 
-If you are using this plugin, you can't lazy load |listish.nvim| any more.
-Therefore your listing setup should not contain any 'after', 'keys', 'cmd',
-'ft', or anything that marks it as an 'opt' package.
+If you are using this plugin, you can't lazy load |listish.txt| any more.
+Therefore your listing setup should not contain any `after`, `keys`, `cmd`,
+`ft`, or anything that marks it as an `opt` package.
 
-CONFIGURATION                                          *fzfmania-configuration*
+CONFIGURATION                                         *fzfmania-configuration*
 ------------------------------------------------------------------------------
 
-If you don't pass anything to the 'config()' function, it enable everything
+If you don't pass anything to the `config()` function, it enable everything
 with their default. You can change individual settings by providing
-replacements, or disable them by setting them to 'false'.
+replacements, or disable them by setting them to `false`.
+
 >lua
   require("fzfmania").config({
     frontend = "fzf-lua", -- uses fzf-lua for handling the ui
@@ -140,6 +146,7 @@ replacements, or disable them by setting them to 'false'.
 
 You may also use this form to only enable a few items. In this setup only in
 files search and listing files mappings are set:
+
 >lua
   require("fzfmania").config_empty({
     mappings = {
@@ -149,14 +156,15 @@ files search and listing files mappings are set:
   })
 <
 
-Note that you also want to set the 'fzf_actions', they will become disabled if
-you use the 'config_empty' function.
+Note that you also want to set the `fzf_actions`, they will become disabled if
+you use the `config_empty` function.
 
 Some mappings can be in form of a string or a table. If you provide a string,
 it only creates the map for when you can't filter by filenames. If you
 provide a table with two values, the first one doesn't filter by filenames,
 and the second one will do. In these cases, I have chosen the capitalised
 second letter for enabling file names filtering. For example:
+
 >lua
   in_files = {
     "<leader>ff", -- doesn't filter filenames as you type
@@ -171,20 +179,20 @@ Here is a list of default configurations:
 >lua
   {
     fzf_history_dir = vim.env.HOME .. "/.local/share/fzf-history",
-    frontend = "fzf.vim",                -- set to "fzf-lua" for handling the ui
+    frontend = "fzf.vim",                -- set to fzf-lua for handling the ui
     mappings = {
       commands = "<leader>:",            -- Show commands
       history  = "<leader>fh",           -- Show history
       files    = "<C-p>",                -- Show files in cwd
-      files_location = {                 -- Show files in home or given location
+      files_location = {                 -- Show files in home/given location
         loc = vim.env.HOME,              -- You can set to any location
-        key = "<M-p>",                    -- Alt+p
+        key = "<M-p>",                   -- Alt+p
       },
       buffers            = "<C-b>",      -- Show buffers
       delete_buffers     = "<M-b>",      -- Delete buffers
       git_files          = "<leader>gf", -- Show files in git (git ls-files)
-      buffer_lines       = "<C-_>",      -- CTRL-/ grep lines of current buffer
-      all_buffer_lines   = "<M-/>",      -- Search in lines of all open buffers
+      buffer_lines       = "<C-_>",      -- CTRL-/ grep lines of current buf
+      all_buffer_lines   = "<M-/>",      -- Search in lines of all open bufs
       complete_dict      = "<c-x><c-k>", -- (Inser mode) dict completion
       complete_path      = "<c-x><c-f>", -- (Insert mode) path completion
       complete_line      = "<c-x><c-l>", -- (Insert mode) line completion
@@ -256,7 +264,7 @@ Most actions can apply to multiple selected items if possible.
              Note that if a |LSP| server is not attached to the buffer,
              it will fall back to |ctags|.
 
-             Sometimes when you list files and 'sink' with @, the |LSP|
+             Sometimes when you list files and `sink` with @, the |LSP|
              might not be ready yet, therefore it falls back to |ctags|
              immediately. In this case you can cancel, which will land
              you to the file, and you can invoke |LEADER-@| for LSP symbols.
@@ -303,17 +311,17 @@ COMMANDS                                                   *fzfmania-commands*
 
 *:GGrep*           Run git grep
 *:GTree*           Browse git commits
-*:Marks*           Show marks with preview
+`:Marks`           Show marks with preview                   *fzfmania-:Marks*
 *:MarksDelete*     Delete marks
 *:Todo*            List todo/fixme lines
 *:ArgsAdd*         Select and add files to the args list
 *:ArgsDelete*      Select and delete files from the args list
 *:Worktree*        Switch between git worktrees
-*:BLines*          Search in current buffer
-*:History*         Show open file history
+`:BLines`          Search in current buffer                 *fzfmania-:BLines*
+`:History`         Show open file history                  *fzfmania-:History*
 *:Checkout*        Checkout a branch
 *:GitStatus*       Show git status
-*:Jumps*           Choose from jump list
+`:Jumps`           Choose from jump list                     *fzfmania-:Jumps*
 *:Autocmds*        Show autocmds
 *:Changes*         Show change list
 *:Registers*       Show register contents
@@ -390,7 +398,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-*listish* <https://github.com/arsham/listish.nvim>
 
 vim:tw=78:ft=help

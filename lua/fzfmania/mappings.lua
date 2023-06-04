@@ -13,7 +13,7 @@ local function _config(opts)
     frontend = " (fzf-lua)"
   end
   if opts.commands then --{{{
-    local o = op("Show commands")
+    local o = op("Show commands" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.commands, function()
         fzf_cmd.load_command("commands")
@@ -24,15 +24,16 @@ local function _config(opts)
   end --}}}
 
   if opts.history then --{{{
+    local o = op("Show histoty" .. frontend)
     if opts.frontend then
-      vim.keymap.set("n", opts.history, fzf.oldfiles, op("Show history"))
+      vim.keymap.set("n", opts.history, fzf.oldfiles, o)
     else
-      vim.keymap.set("n", opts.history, ":History<CR>", op("Show history"))
+      vim.keymap.set("n", opts.history, ":History<CR>", o)
     end
   end --}}}
 
   if opts.files then --{{{
-    local o = op("Show files")
+    local o = op("Show files" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.files, fzf.files, o)
       vim.keymap.set("n", "<C-S>p", function()
@@ -46,7 +47,7 @@ local function _config(opts)
   end --}}}
 
   if opts.files_location then --{{{
-    local o = op("Show all files in home directory")
+    local o = op("Show all files in home directory" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.files_location.key, function()
         fzf.files({ cwd = opts.files_location.loc })
@@ -58,7 +59,7 @@ local function _config(opts)
   end --}}}
 
   if opts.buffers then --{{{
-    local o = op("Show buffers")
+    local o = op("Show buffers" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.buffers, fzf.buffers, o)
     else
@@ -67,7 +68,7 @@ local function _config(opts)
   end --}}}
 
   if opts.delete_buffers then --{{{
-    local o = op("Delete buffers")
+    local o = op("Delete buffers" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.delete_buffers, util.delete_buffers, o)
     else
@@ -76,7 +77,7 @@ local function _config(opts)
   end --}}}
 
   if opts.git_files then --{{{
-    local o = op("Show files in git (git ls-files)")
+    local o = op("Show files in git (git ls-files)" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.git_files, fzf.git_files, o)
     else
@@ -85,7 +86,7 @@ local function _config(opts)
   end --}}}
 
   if opts.buffer_lines then --{{{
-    local o = op("Grep lines of current buffer")
+    local o = op("Grep lines of current buffer" .. frontend)
     local header = "'<CR>:jumps to line, <C-w>:adds to locallist, <C-q>:adds to quickfix list'"
     if opts.frontend then
       vim.keymap.set("n", opts.buffer_lines, function()
@@ -101,7 +102,7 @@ local function _config(opts)
   end --}}}
 
   if opts.all_buffer_lines then --{{{
-    local o = op("Search in lines of all open buffers")
+    local o = op("Search in lines of all open buffers" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.all_buffer_lines, fzf.lines, o)
     else
@@ -113,25 +114,31 @@ local function _config(opts)
     -- Replace the default dictionary completion with fzf-based fuzzy completion.
     vim.keymap.set("i", "<c-x><c-k>", function()
       vim.fn["fzf#vim#complete"]("cat /usr/share/dict/words-insane")
-    end, op("Dict completion"))
+    end, op("Dict completion" .. frontend))
   end --}}}
 
   if opts.complete_path then --{{{
-    vim.keymap.set("i", opts.complete_path, "<Plug>(fzf-complete-path)", op("Path completion"))
+    vim.keymap.set(
+      "i",
+      opts.complete_path,
+      "<Plug>(fzf-complete-path)",
+      op("Path completion" .. frontend)
+    )
   end --}}}
 
   if opts.complete_line then --{{{
-    vim.keymap.set("i", opts.complete_line, "<Plug>(fzf-complete-line)", op("Line completion"))
+    vim.keymap.set(
+      "i",
+      opts.complete_line,
+      "<Plug>(fzf-complete-line)",
+      op("Line completion" .. frontend)
+    )
   end --}}}
 
   if opts.spell_suggestion then --{{{
+    local o = { desc = "Show spell suggestions" .. frontend }
     if opts.frontend then
-      vim.keymap.set(
-        "n",
-        opts.spell_suggestion,
-        fzf.spell_suggest,
-        { desc = "Show spell suggestions" }
-      )
+      vim.keymap.set("n", opts.spell_suggestion, fzf.spell_suggest, o)
     else
       vim.keymap.set("n", opts.spell_suggestion, function()
         local term = vim.fn.expand("<cword>")
@@ -142,7 +149,7 @@ local function _config(opts)
           end,
           down = 10,
         })
-      end, { desc = "Show spell suggestions" })
+      end, o)
     end
   end --}}}
 
@@ -182,7 +189,7 @@ local function _config(opts)
       in_files_force = in_files_force[1]
     end
 
-    local o = { desc = "Find in files (ignore .gitignore)" }
+    local o = { desc = "Find in files (ignore .gitignore)" .. frontend }
     if opts.frontend then
       vim.keymap.set("n", in_files_force, function()
         fzf.grep({
@@ -212,7 +219,7 @@ local function _config(opts)
   end --}}}
 
   if opts.incremental_search then --{{{
-    local o = { desc = "Incremental search with rg" }
+    local o = { desc = "Incremental search with rg" .. frontend }
     if opts.frontend then
       vim.keymap.set("n", opts.incremental_search, function()
         fzf.live_grep({ exec_empty_query = true })
@@ -232,7 +239,7 @@ local function _config(opts)
       current_word = current_word[1]
     end
 
-    local o = { desc = "Search over current word" }
+    local o = { desc = "Search over current word" .. frontend }
     if opts.frontend then
       vim.keymap.set("n", current_word, function()
         fzfgrep.grep_cword({
@@ -262,7 +269,7 @@ local function _config(opts)
       current_word_force = current_word_force[1]
     end
 
-    local o = { desc = "Search over current word (ignore .gitignore)" }
+    local o = { desc = "Search over current word (ignore .gitignore)" .. frontend }
     if opts.frontend then
       vim.keymap.set("n", current_word_force, function()
         fzfgrep.grep_cword({
@@ -291,7 +298,7 @@ local function _config(opts)
   end --}}}
 
   if opts.marks then --{{{
-    local o = { desc = "Show marks" }
+    local o = { desc = "Show marks" .. frontend }
     if opts.frontend then
       vim.keymap.set("n", opts.marks, fzf.marks, o)
     else
@@ -300,9 +307,14 @@ local function _config(opts)
   end --}}}
 
   if opts.tags then --{{{
-    vim.keymap.set("n", opts.tags, function()
-      vim.api.nvim_command("BTags")
-    end, op("Show tags"))
+    local btags = vim.cmd.BTags
+    if opts.frontend then
+      btags = function()
+        vim.cmd.FzfLua("btags")
+      end
+    end
+
+    vim.keymap.set("n", opts.tags, btags, op("Show tags" .. frontend))
   end --}}}
 end
 

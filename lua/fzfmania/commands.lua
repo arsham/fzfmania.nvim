@@ -3,8 +3,12 @@ local command = require("arshlib.quick").command
 local fzf = require("fzf-lua")
 
 local function config(opts)
+  local frontend = " (native)"
+  if opts.frontend then
+    frontend = " (fzf-lua)"
+  end
   if opts.git_grep then --{{{
-    local o = { bang = true, nargs = "*", desc = "Interactivly grep in commits" }
+    local o = { bang = true, nargs = "*", desc = "Interactivly grep in commits" .. frontend }
     command(opts.git_grep, util.git_grep, o)
   end --}}}
 
@@ -15,7 +19,7 @@ local function config(opts)
 
   if opts.buffer_lines then --{{{
     local header = "<CR>:jumps to line, <C-w>:adds to locallist, <C-q>:adds to quickfix list"
-    local o = { desc = "Search in current buffer lines" }
+    local o = { desc = "Search in current buffer lines" .. frontend }
     if opts.frontend then
       command(opts.buffer_lines, function()
         fzf.blines({
@@ -36,12 +40,12 @@ local function config(opts)
   end --}}}
 
   if opts.config then --{{{
-    local o = { desc = "Open config files" }
+    local o = { desc = "Open config files" .. frontend }
     command(opts.config, util.open_config, o)
   end --}}}
 
   if opts.todo then --{{{
-    local o = { desc = "Search for TODO tags" }
+    local o = { desc = "Search for TODO tags" .. frontend }
     if opts.frontend then
       command(opts.todo, function()
         fzf.grep({
@@ -55,7 +59,7 @@ local function config(opts)
   end --}}}
 
   if opts.marks_delete then --{{{
-    local o = { desc = "Delete marks interactivly with fzf." }
+    local o = { desc = "Delete marks interactivly with fzf" .. frontend }
     if opts.frontend then
       command(opts.marks_delete, util.delete_marks, o)
     else
@@ -64,7 +68,7 @@ local function config(opts)
   end --}}}
 
   if opts.marks then --{{{
-    local o = { bang = true, bar = true, desc = "Marks with preview" }
+    local o = { bang = true, bar = true, desc = "Marks with preview" .. frontend }
     if opts.frontend then
       command(opts.marks, fzf.marks, o)
     else
@@ -73,7 +77,7 @@ local function config(opts)
   end --}}}
 
   if opts.args_add then --{{{
-    local o = { desc = "Add to arglist" }
+    local o = { desc = "Add to arglist" .. frontend }
     if opts.frontend then
       command(opts.args_add, util.add_args, o)
     else
@@ -82,7 +86,7 @@ local function config(opts)
   end --}}}
 
   if opts.args_delete then --{{{
-    local o = { desc = "Delete from arglist" }
+    local o = { desc = "Delete from arglist" .. frontend }
     if opts.frontend then
       command(opts.args_delete, util.delete_args, o)
     else
@@ -91,7 +95,7 @@ local function config(opts)
   end --}}}
 
   if opts.history then --{{{
-    local desc = "Browse file history"
+    local desc = "Browse file history" .. frontend
     if opts.frontend then
       command(opts.history, fzf.oldfiles, { desc = desc })
     else
@@ -104,7 +108,7 @@ local function config(opts)
   end --}}}
 
   if opts.checkout then --{{{
-    local o = { bang = true, nargs = 0, desc = "Checkout a branch" }
+    local o = { bang = true, nargs = 0, desc = "Checkout a branch" .. frontend }
     if opts.frontend then
       command(opts.checkout, fzf.git_branches, o)
     else
@@ -113,7 +117,8 @@ local function config(opts)
   end --}}}
 
   if opts.work_tree then --{{{
-    local o = { desc = "Switch git worktrees. It creates a new tab in the new location" }
+    local o =
+      { desc = "Switch git worktrees. It creates a new tab in the new location" .. frontend }
     command(opts.work_tree, function()
       local cmd = "git worktree list | cut -d' ' -f1"
       local wrapped = vim.fn["fzf#wrap"]({
@@ -130,12 +135,12 @@ local function config(opts)
 
   if opts.git_status then --{{{
     if opts.frontend then
-      command(opts.git_status, fzf.git_status, { desc = "View git status" })
+      command(opts.git_status, fzf.git_status, { desc = "View git status" .. frontend })
     end
   end --}}}
 
   if opts.autocmds then --{{{
-    local o = { bang = true, nargs = 0, desc = "Show all autocmds" }
+    local o = { bang = true, nargs = 0, desc = "Show all autocmds" .. frontend }
     if opts.frontend then
       command(opts.autocmds, util.autocmds, o)
     else
@@ -144,21 +149,21 @@ local function config(opts)
   end --}}}
 
   if opts.jumps then --{{{
-    local o = { desc = "Browse jumps" }
+    local o = { desc = "Browse jumps" .. frontend }
     if opts.frontend then
       command(opts.jumps, fzf.jumps, o)
     end
   end --}}}
 
   if opts.changes then --{{{
-    local o = { desc = "Browse changes" }
+    local o = { desc = "Browse changes" .. frontend }
     if opts.frontend then
       command(opts.changes, fzf.changes, o)
     end
   end --}}}
 
   if opts.registers then --{{{
-    local o = { desc = "View registers" }
+    local o = { desc = "View registers" .. frontend }
     if opts.frontend then
       command(opts.registers, fzf.registers, o)
     end
@@ -166,19 +171,20 @@ local function config(opts)
 
   if opts.frontend then
     -- these are replacing the native fzf.vim commands.
-    command("Buffers", fzf.buffers, { desc = "Browse loaded buffers" })
-    command("Lines", fzf.lines, { desc = "Open buffer lines" })
-    command("BLines", fzf.blines, { desc = "Buffer lines" })
-    command("Commits", fzf.git_commits, { desc = "Browse commits" })
-    command("BCommits", fzf.git_bcommits, { desc = "Buffer commits" })
-    command("Branches", fzf.git_branches, { desc = "Git branches" })
-    command("Tabs", fzf.tabs, { desc = "Browse tabs" })
-    command("Colors", fzf.colorschemes, { desc = "Browse colour schemes" })
-    command("Args", fzf.args, { desc = "Browse and delete from arglist" })
-    command("Maps", fzf.keymaps, { desc = "Browse the registered keymaps" })
-    command("Filetypes", fzf.filetypes, { desc = "Browse the registered filetypes" })
-    command("GitFiles", fzf.git_files, { desc = "Browse the files in git" })
-    command("GFiles", fzf.git_files, { desc = "Browse the files in git" })
+    command("Buffers", fzf.buffers, { desc = "Browse loaded buffers" .. frontend })
+    command("Lines", fzf.lines, { desc = "Open buffer lines" .. frontend })
+    command("BLines", fzf.blines, { desc = "Buffer lines" .. frontend })
+    command("Commits", fzf.git_commits, { desc = "Browse commits" .. frontend })
+    command("BCommits", fzf.git_bcommits, { desc = "Buffer commits" .. frontend })
+    command("Branches", fzf.git_branches, { desc = "Git branches" .. frontend })
+    command("Tabs", fzf.tabs, { desc = "Browse tabs" .. frontend })
+    command("Colors", fzf.colorschemes, { desc = "Browse colour schemes" .. frontend })
+    command("Args", fzf.args, { desc = "Browse and delete from arglist" .. frontend })
+    command("Maps", fzf.keymaps, { desc = "Browse the registered keymaps" .. frontend })
+    command("Filetypes", fzf.filetypes, { desc = "Browse the registered filetypes" .. frontend })
+    command("Files", fzf.files, { desc = "Browse files" .. frontend })
+    command("GitFiles", fzf.git_files, { desc = "Browse the files in git" .. frontend })
+    command("GFiles", fzf.git_files, { desc = "Browse the files in git" .. frontend })
   end
 end
 

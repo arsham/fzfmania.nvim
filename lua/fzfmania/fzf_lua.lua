@@ -2,9 +2,21 @@ local actions = require("fzf-lua.actions")
 local quick = require("arshlib.quick")
 local fzf = require("fzf-lua")
 local lsp = require("arshlib.lsp")
+local path = require("fzf-lua.path")
 
-local function sink_line_number(lines) --{{{
-  vim.cmd.edit(lines[1])
+local function get_filename(selected) -- {{{
+  if #selected < 1 then
+    return nil
+  end
+  return path.entry_to_file(selected[1]).path
+end -- }}}
+
+local function sink_line_number(selected) --{{{
+  local filename = get_filename(selected)
+  if not filename then
+    return
+  end
+  vim.cmd.edit(filename)
   quick.normal("n", ":")
 end --}}}
 
@@ -146,19 +158,27 @@ require("fzf-lua").setup({
       ["ctrl-t"] = actions.file_tabedit,
       ["alt-q"] = actions.file_sel_to_qf,
       ["alt-w"] = actions.file_sel_to_ll,
-      ["alt-@"] = function(lines)
-        vim.cmd.edit(lines[1])
+      ["alt-@"] = function(selected)
+        local filename = get_filename(selected)
+        if not filename then
+          return
+        end
+        vim.cmd.edit(filename)
         if lsp.is_lsp_attached() and lsp.has_lsp_capability("documentSymbolProvider") then
           fzf.lsp_document_symbols({ jump_to_single_result = true })
           actions.ensure_insert_mode()
           return
         end
-        vim.cmd.BTags()
+        vim.cmd.FzfLua("btags")
         actions.ensure_insert_mode()
       end,
       ["alt-:"] = sink_line_number,
-      ["alt-/"] = function(lines)
-        vim.cmd.edit(lines[1])
+      ["alt-/"] = function(selected)
+        local filename = get_filename(selected)
+        if not filename then
+          return
+        end
+        vim.cmd.edit(filename)
         fzf.blines()
         actions.ensure_insert_mode()
       end,

@@ -252,6 +252,16 @@ require("fzf-lua").setup({
     actions = {
       ["default"] = actions.file_edit,
     },
+    winopts = {
+      preview = {
+        hidden = "hidden",
+        delay = 0,
+      },
+      height = 0.3,
+      width = 1,
+      row = 1,
+      border = false,
+    },
   }, --}}}
 
   git = { --{{{
@@ -350,6 +360,16 @@ require("fzf-lua").setup({
     prompt = "Args❯ ",
     files_only = true,
     actions = { ["ctrl-x"] = { actions.arg_del, actions.resume } },
+    winopts = {
+      preview = {
+        hidden = "hidden",
+        delay = 0,
+      },
+      height = 0.3,
+      width = 1,
+      row = 1,
+      border = false,
+    },
   }, --}}}
 
   oldfiles = { --{{{
@@ -359,8 +379,13 @@ require("fzf-lua").setup({
     include_current_session = false, -- include bufs from current session
     winopts = {
       preview = {
-        delay = 20,
+        hidden = "hidden",
+        delay = 0,
       },
+      height = 0.3,
+      width = 1,
+      row = 1,
+      border = false,
     },
   }, --}}}
 
@@ -375,8 +400,13 @@ require("fzf-lua").setup({
     },
     winopts = {
       preview = {
+        hidden = "hidden",
         delay = 0,
       },
+      height = 0.3,
+      width = 1,
+      row = 1,
+      border = false,
     },
   }, --}}}
 

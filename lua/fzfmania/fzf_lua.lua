@@ -8,6 +8,54 @@ local function sink_line_number(lines) --{{{
   quick.normal("n", ":")
 end --}}}
 
+-- FD exclude list {{{
+local fd_exclude = " -E "
+  .. table.concat({
+    "'*.JPEG'",
+    "'*.JPG'",
+    "'*.gif'",
+    "'*.iso'",
+    "'*.jpeg'",
+    "'*.jpg'",
+    "'*.mp4'",
+    "'*.part'",
+    "'*.pdf'",
+    "'*.png'",
+    "'*.so'",
+    "'*.o'",
+    "'*.o.d'",
+    "'*.svg'",
+    "'*.h.in'",
+    ".cache",
+    ".dropbox",
+    ".gimme",
+    ".git",
+    ".helm",
+    ".kube",
+    ".local/lib",
+    ".local/pipx",
+    ".local/share",
+    ".mozilla",
+    ".npm",
+    ".rustup",
+    ".steam",
+    ".themes",
+    ".virtualenvs",
+    "Documents/pkgbuild",
+    "Dropbox/.dropbox.cache",
+    "Dropbox/Home/.purple",
+    "Pictures",
+    "Videos",
+    "dotfiles",
+    "go/pkg",
+    "node_modules",
+    "target",
+    "tmp/delete",
+    "tmp/googleapis",
+    "zig-cache",
+    "tmp/neovim",
+  }, " -E ") -- }}}
+
 require("fzf-lua").setup({
   winopts = { --{{{
     height = 0.7,
@@ -180,7 +228,7 @@ require("fzf-lua").setup({
     color_icons = true,
     find_opts = [[-type f -not -path '*/\.git/*' -printf '%P\n']],
     rg_opts = "--color=never --files --hidden --follow --smart-case  -g '!.git'",
-    fd_opts = "--color=never --type f --hidden --follow  --no-ignore --exclude .git --exclude target --exclude .cache --exclude node_modules",
+    fd_opts = "--color=never --type f --hidden --follow  --no-ignore" .. fd_exclude,
     actions = {
       ["default"] = actions.file_edit,
     },

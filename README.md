@@ -157,7 +157,10 @@ Here is a list of default configurations:
   mappings = {
     commands = "<leader>:",            -- Show commands
     history  = "<leader>fh",           -- Show history
-    files    = "<C-p>",                -- Show files in cwd
+    files    = {                       -- show files in cwd
+      filtered = "<C-p>",
+      all = "<C-S-p>",                 -- fzf-lua only
+    },
     files_location = {                 -- Show files in home or given location
       loc = vim.env.HOME,              -- You can set to any location
       key = "<M-p>",                    -- Alt+p

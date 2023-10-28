@@ -38,7 +38,10 @@ local defaults = {
   mappings = {
     commands = "<leader>:",            -- show commands
     history  = "<leader>fh",           -- show history
-    files    = "<C-p>",                -- show files in cwd
+    files    = {                       -- show files in cwd
+      filtered = "<C-p>",
+      all = "<C-S-p>",                 -- fzf-lua only
+    },
     files_location = {                 -- show files in home or given location
       loc = vim.env.HOME,
       key = "<M-p>",                    -- Alt+p

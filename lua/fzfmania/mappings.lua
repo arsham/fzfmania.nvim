@@ -34,15 +34,22 @@ local function _config(opts)
 
   if opts.files then --{{{
     local o = op("Show (filtered) files" .. frontend)
+    if type(opts.files) == "string" then
+      -- backwards compatibility
+      opts.files.filtered = opts.files
+      opts.files.all = opts.filtered
+    end
     if opts.frontend then
-      vim.keymap.set("n", opts.files, fzf.files, o)
-      vim.keymap.set("n", "<C-S>p", function()
-        fzf.files({
-          rg_opts = "--color=never --files --hidden --follow --smart-case  --no-ignore -g '!.git'",
-        })
-      end, o)
+      vim.keymap.set("n", opts.files.filtered, fzf.files, o)
     else
-      vim.keymap.set("n", opts.files, ":Files<CR>", o)
+      vim.keymap.set("n", opts.files.filtered, ":Files<CR>", o)
+    end
+    if opts.frontend and opts.files.all then
+      vim.keymap.set("n", opts.files.all, function()
+        fzf.files({
+          fd_opts = "--color=never --type f --hidden --follow  --no-ignore",
+        })
+      end, op("Show (all) files" .. frontend))
     end
   end --}}}
 

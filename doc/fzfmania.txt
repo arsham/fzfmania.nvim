@@ -252,47 +252,66 @@ MAPPINGS                                                   *fzfmania-mappings*
 
 Most actions can apply to multiple selected items if possible.
 
-*CTRL-p*     File list in current folder.                    *fzfmania_CTRL-p*
-*ALT-p*      File list in home folder.                        *fzfmania_ALT-p*
-*CTRL-b*     Buffer list.                                    *fzfmania_CTRL-b*
-*ALT-b*      Delete buffers from the buffer list.             *fzfmania_ALT-b*
-*CTRL-/*     Search in lines on current buffer.              *fzfmania_CTRL-/*
-*ALT-/*      Search in lines of all open buffers.             *fzfmania_ALT-/*
-*LEADER-@*                                                 *fzfmania_LEADER-@*
-             Search in ctags or LSP symbols (see below).
+                                                              *CTRL-p* *<C-p>*
+<Ctrl-p>      File list in current folder.
+                                                      *CTRL-SHIFT-p* *<C-S-p>*
+<Ctrl-Shift-p> File list in current folder without filters. (fzf-lua only)
+                                                               *ALT-p* *<M-p>*
+<Alt-p>       File list in home folder.
+                                                              *CTRL-b* *<C-b>*
+<Ctrl-b>      Buffer list.
+                                                               *ALT-b* *<M-b>*
+<Alt-b>       Delete buffers from the buffer list.
+                                                              *CTRL-/* *<C-/>*
+<Ctrl-/>      Search in lines on current buffer.
+                                                               *ALT-/* *<M-/>*
+<Alt-/>       Search in lines of all open buffers.
 
-             Note that if a |LSP| server is not attached to the buffer,
-             it will fall back to |ctags|.
+                                                                   *<Leader>@*
+<Leader-@>    Search in ctags or LSP symbols (see below).
 
-             Sometimes when you list files and `sink` with @, the |LSP|
-             might not be ready yet, therefore it falls back to |ctags|
-             immediately. In this case you can cancel, which will land
-             you to the file, and you can invoke |LEADER-@| for LSP symbols.
+              Note that if a |LSP| server is not attached to the buffer,
+              it will fall back to |ctags|.
 
-*LEADER-:*   Show Commands.                                *fzfmania_LEADER-:*
-*LEADER-ff*                                               *fzfmania_LEADER-ff*
-             Find in contents of all files in current folder.
+              Sometimes when you list files and `sink` with @, the |LSP|
+              might not be ready yet, therefore it falls back to |ctags|
+              immediately. In this case you can cancel, which will land
+              you to the file, and you can invoke |<Leader>@| for LSP symbols.
 
-*LEADER-fa*                                               *fzfmania_LEADER-fa*
-             Find All, disabling '.gitignore' handling.
+                                                                   *<Leader>:*
+<Leader-:>    Show Commands.
+                                                                  *<Leader>ff*
+<Leader-ff>   Find in contents of all files in current folder.
 
-*LEADER-fi*  Find Incrementally.                          *fzfmania_LEADER-fi*
-*LEADER-rg*  Search (rg) with current word.               *fzfmania_LEADER-rg*
-*LEADER-ra*                                               *fzfmania_LEADER-ra*
-             Search (rg) disabling '.gitignore' handling.
+                                                                  *<Leader>fa*
+<Leader-fa>   Find All, disabling '.gitignore' handling.
 
-*LEADER-ri*                                               *fzfmania_LEADER-ri*
-             Incrementally search (rg) with current word.
+                                                                  *<Leader>fi*
+<Leader-fi>   Find Incrementally.
+                                                                  *<Leader>rg*
+<Leader-rg>   Search (rg) with current word.
+                                                                  *<Leader>ra*
+<Leader-ra>   Search (rg) disabling '.gitignore' handling.
+                                                                  *<Leader>ri*
+<Leader-ri>   Incrementally search (rg) with current word.
+                                                                  *<Leader>fh*
+<Leader-fh>   File History
+                                                                  *<Leader>gf*
+<Leader-gf>   GFiles
+                                                                  *<Leader>mm*
+<Leader-mm>   Marks
+                                              *i_<C-x><C-k>* *i_CTRL-x_CTRL-k*
+i_<Ctrl-x><Ctrl-k>
+              Search in dictionaries (requires words-insane)
 
-*LEADER-fh*  File History                                 *fzfmania_LEADER-fh*
-*LEADER-gf*  GFiles                                       *fzfmania_LEADER-gf*
-*LEADER-mm*  Marks                                        *fzfmania_LEADER-mm*
-*CTRL-x_CTRL-k*                                       *fzfmania_CTRL-x_CTRL-k*
-             Search in dictionaries (requires words-insane)
-
-*CTRL-x_CTRL-f* Search in files                       *fzfmania_CTRL-x_CTRL-f*
-*CTRL-x_CTRL-l* Search in lines                       *fzfmania_CTRL-x_CTRL-l*
-*LEADER-t*   Invoke fzf-lua builtin popup                  *fzfmania_LEADER-t*
+                                              *i_<C-x><C-f>* *i_CTRL-x_CTRL-f*
+i_<Ctrl-x><Ctrl-f>
+              Search in files
+                                              *i_<C-x><C-l>* *i_CTRL-x_CTRL-l*
+i_<Ctrl-x_CTRL-l>
+              Search in lines
+                                                                   *<Leader>t*
+<Leader-t>    Invoke fzf-lua builtin popup
 
 If you keep hitting |CTRL-/| the preview window will change width. With
 *SHIFT-/* you can show and hide the preview window.
@@ -300,77 +319,99 @@ If you keep hitting |CTRL-/| the preview window will change width. With
 When a file is selected, additional to what fzf provides out of the box, you
 can invoke one of these secondary actions:
 
-*t_ALT-/*      To search in the lines.                 *fzfmania-action_ALT-/*
-*t_ALT-@*      To search in ctags or lsp symbols.      *fzfmania-action_ALT-@*
-*t_ALT-:*      To go to a specific line.               *fzfmania-action_ALT-:*
-*t_ALT-q*      Add items to the quickfix list.         *fzfmania-action_ALT-q*
-*t_ALT-w*      Add items to the local list.            *fzfmania-action_ALT-w*
+                                                           *t_<M-/>* *t_ALT-/*
+<t_alt-/>      To search in the lines.
+                                                           *t_<M-@>* *t_ALT-@*
+<t_alt-@>      To search in ctags or lsp symbols.
+                                                           *t_<M-:>* *t_ALT-:*
+<t_alt-:>      To go to a specific line.
+                                                           *t_<M-q>* *t_ALT-q*
+<t_alt-q>      Add items to the quickfix list.
+                                                           *t_<M-w>* *t_ALT-w*
+<t_alt-w>      Add items to the local list.
 
 ==============================================================================
 COMMANDS                                                   *fzfmania-commands*
 
-*:GGrep*           Run git grep
-*:GTree*           Browse git commits
-`:Marks`           Show marks with preview                   *fzfmania-:Marks*
-*:MarksDelete*     Delete marks
-*:Todo*            List todo/fixme lines
-*:ArgsAdd*         Select and add files to the args list
-*:ArgsDelete*      Select and delete files from the args list
-*:Worktree*        Switch between git worktrees
-`:BLines`          Search in current buffer                 *fzfmania-:BLines*
-`:History`         Show open file history                  *fzfmania-:History*
-*:Checkout*        Checkout a branch
-*:GitStatus*       Show git status
-`:Jumps`           Choose from jump list                     *fzfmania-:Jumps*
-*:Autocmds*        Show autocmds
-*:Changes*         Show change list
-*:Registers*       Show register contents
+                                                                      *:GGrep*
+:GGrep        Run git grep
+                                                                      *:GTree*
+:GTree        Browse git commits
+                                                             *fzfmania-:Marks*
+:Marks        Show marks with preview
+                                                                *:MarksDelete*
+:MarksDelete  Delete marks
+                                                                       *:Todo*
+:Todo         List todo/fixme lines
+                                                                    *:ArgsAdd*
+:ArgsAdd      Select and add files to the args list
+                                                                 *:ArgsDelete*
+:ArgsDelete   Select and delete files from the args list
+                                                                   *:Worktree*
+:Worktree     Switch between git worktrees
+                                                            *fzfmania-:BLines*
+:BLines       Search in current buffer
+                                                           *fzfmania-:History*
+:History      Show open file history
+                                                                   *:Checkout*
+:Checkout     Checkout a branch
+                                                                  *:GitStatus*
+:GitStatus    Show git status
+                                                             *fzfmania-:Jumps*
+:Jumps        Choose from jump list
+                                                                   *:Autocmds*
+:Autocmds     Show autocmds
+                                                                    *:Changes*
+:Changes      Show change list
+                                                                  *:Registers*
+:Registers    Show register contents
 
 ==============================================================================
 FUNCTIONS                                                 *fzfmania-functions*
 
 These functions can be imported from the 'fzfmania.util' module.
 
-*ripgrep_search()*                                   *fzfmania-ripgrep_search*
+                                                            *ripgrep_search()*
+ripgrep_search()
              Ripgrep search
-
-*ripgrep_search_incremental()*           *fzfmania-ripgrep_search_incremental*
+                                                *ripgrep_search_incremental()*
+ripgrep_search_incremental()
              Incremental Ripgrep search with fzf
-
-*delete_buffer()*                                     *fzfmania-delete_buffer*
+                                                             *delete_buffer()*
+delete_buffer()
              Shows all opened buffers and let you delete them
-
-*lines_grep()*                                           *fzfmania-lines_grep*
+                                                                *lines_grep()*
+lines_grep()
              Incremental searches in the lines of current buffer
-
-*open_config()*                                         *fzfmania-open_config*
+                                                               *open_config()*
+open_config()
              Open one of your Neovim config files
-
-*marks()*                                                     *fzfmania-marks*
+                                                                     *marks()*
+marks()
              Show marks with preview
-
-*delete_marks()*                                       *fzfmania-delete_marks*
+                                                              *delete_marks()*
+delete_marks()
              Show marks for deletion
-
-*git_grep()*                                               *fzfmania-git_grep*
+                                                                  *git_grep()*
+git_grep()
              Two phase search in all git commits
-
-*checkout_branch()*                                 *fzfmania-checkout_branch*
+                                                           *checkout_branch()*
+checkout_branch()
              Checkout a branch
-
-*open_todo()*                                             *fzfmania-open_todo*
+                                                                 *open_todo()*
+open_todo()
              Search for all todo/fixme/etc.
-
-*add_args()*                                               *fzfmania-add_args*
+                                                                  *add_args()*
+add_args()
              Find and add files to the args list
-
-*delete_args()*                                         *fzfmania-delete_args*
+                                                               *delete_args()*
+delete_args()
              Choose and remove files from the args list
-
-*insert_into_list()*                               *fzfmania-insert_into_list*
+                                                          *insert_into_list()*
+insert_into_list()
              (Action) Populate quickfix/local lists with search results
-
-*goto_def()*                                               *fzfmania-goto_def*
+                                                                  *goto_def()*
+goto_def()
              (Action) Go to definition. In absence of LSP falls back to BTags
 
 

@@ -33,7 +33,7 @@ local function _config(opts)
   end --}}}
 
   if opts.files then --{{{
-    local o = op("Show files" .. frontend)
+    local o = op("Show (filtered) files" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.files, fzf.files, o)
       vim.keymap.set("n", "<C-S>p", function()
@@ -136,7 +136,7 @@ local function _config(opts)
   end --}}}
 
   if opts.spell_suggestion then --{{{
-    local o = { desc = "Show spell suggestions" .. frontend }
+    local o = op("Show spell suggestions" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.spell_suggestion, fzf.spell_suggest, o)
     else
@@ -161,7 +161,7 @@ local function _config(opts)
       in_files = in_files[1]
     end
 
-    local o = { desc = "Find in files" .. frontend }
+    local o = op("Find in files" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", in_files, function()
         fzf.grep({ search = "", fzf_opts = { ["--nth"] = "2..", ["--delimiter"] = "'[:]'" } })
@@ -189,7 +189,7 @@ local function _config(opts)
       in_files_force = in_files_force[1]
     end
 
-    local o = { desc = "Find in files (ignore .gitignore)" .. frontend }
+    local o = op("Find in files (ignoring .gitignore directives)" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", in_files_force, function()
         fzf.grep({
@@ -219,7 +219,7 @@ local function _config(opts)
   end --}}}
 
   if opts.incremental_search then --{{{
-    local o = { desc = "Incremental search with rg" .. frontend }
+    local o = op("Incremental search with rg" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.incremental_search, function()
         fzf.live_grep({ exec_empty_query = true })
@@ -239,7 +239,7 @@ local function _config(opts)
       current_word = current_word[1]
     end
 
-    local o = { desc = "Search over current word" .. frontend }
+    local o = op("Search over current word" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", current_word, function()
         fzfgrep.grep_cword({
@@ -269,7 +269,7 @@ local function _config(opts)
       current_word_force = current_word_force[1]
     end
 
-    local o = { desc = "Search over current word (ignore .gitignore)" .. frontend }
+    local o = op("Search over current word (ignoring .gitignore directives)" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", current_word_force, function()
         fzfgrep.grep_cword({
@@ -298,7 +298,7 @@ local function _config(opts)
   end --}}}
 
   if opts.marks then --{{{
-    local o = { desc = "Show marks" .. frontend }
+    local o = op("Show marks" .. frontend)
     if opts.frontend then
       vim.keymap.set("n", opts.marks, fzf.marks, o)
     else
